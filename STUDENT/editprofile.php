@@ -326,7 +326,7 @@ input[type="submit"]:hover {
     <div class="body">
         <nav class="side-bar">
             <div class="user-p">
-                <img src="logo.png" alt=""/>
+                <img src="../logo.png" alt=""/>
             </div>
             <ul>
                 <li>
