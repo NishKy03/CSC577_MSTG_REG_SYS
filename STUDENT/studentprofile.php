@@ -1,43 +1,41 @@
 <?php
-require_once("dbConnect.php");
 session_start();
+require_once("../dbConnect.php");
 
+// Check if user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("location: welcome.php"); // Redirect to login page if not logged in
+    header("location: ../welcome.php"); // Redirect to login page if not logged in
     exit;
 }
 
-$username = $_SESSION['username'];
+// Fetch student data from the database
+$studentInfo = [];
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+    
+    $sql = "SELECT * FROM STUDENT WHERE STUID = ?";
+    $stmt = $dbCon->prepare($sql);
+    $stmt->bind_param('s', $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-// Fetch the student's full name
-$sql = "SELECT STUNAME FROM student WHERE STUID = ?";
-$stmt = $dbCon->prepare($sql);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$stmt->store_result();
-$stmt->bind_result($fullName);
-$stmt->fetch();
-$stmt->close();
+    if ($result->num_rows === 1) {
+        $studentInfo = $result->fetch_assoc();
+    } else {
+        echo "<script>alert('Student data not found.');</script>";
+    }
 
-// Split the full name to get the first name and convert to uppercase
-$firstName = strtoupper(strtok($fullName, ' '));
+    $sql = "SELECT STUNAME FROM student WHERE STUID = ?";
+    $stmt = $dbCon->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($fullName);
+    $stmt->fetch();
 
-// Fetch counts for students and clerks
-$totalStudents = 0;
-$totalClerks = 0;
-
-$sql = "SELECT COUNT(*) AS count FROM student";
-$result = $dbCon->query($sql);
-if ($result) {
-    $row = $result->fetch_assoc();
-    $totalStudents = $row['count'];
-}
-
-$sql = "SELECT COUNT(*) AS count FROM clerk";
-$result = $dbCon->query($sql);
-if ($result) {
-    $row = $result->fetch_assoc();
-    $totalClerks = $row['count'];
+    // Split the full name to get the first name and convert to uppercase
+    $firstName = strtoupper(strtok($fullName, ' '));
+    $stmt->close();
 }
 
 $dbCon->close();
@@ -50,6 +48,7 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" />
     <title>User Dashboard</title>
 </head>
 <style>
@@ -213,101 +212,44 @@ $dbCon->close();
     margin-left: 20px;
     margin-right: 15px; /* Space between the icon and text */
 }
-
-.slider {
-    width: 100%;
-    overflow: hidden;
-	position: relative;
+.profile-wrapper{
+    width: 700px;
+    height: auto;
+    background: #9e9696d4;
+    margin-top: 100px;
 }
-.images {
-    display: flex;
-    width: 100%;
-}
-.images img {
-    height: 450px;
-    width: 100%;
-    transition: all 0.15s ease;
-}
-.images input {
-    display: none;
-}
-.dots {
-    display: flex;
-    justify-content: center;
-    margin: 5px;
-}
-.dots label {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    border: solid #fff 3px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    margin: 5px;
-}
-.dots label:hover {background: #fff;}
-#img1:checked ~ .m1 {
-    margin-left: 0;
-}
-#img2:checked ~ .m2 {
-    margin-left: -100%;
-}
-#img3:checked ~ .m3 {
-    margin-left: -200%;
-}
-#img4:checked ~ .m4 {
-    margin-left: -300%;
-}
-.latest-infographic {
-    background-color: #f7f7f7;
-    height: 70px;
+.profile-wrapper h2{
+    text-align: center;
     font-size: 25px;
-    background-color: #6eabe3;
-    color: white;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
+    padding: 15px;
+}
+.profile-wrapper p{
+    padding: 10px;
+    font-size: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    font-family:"Inter";
+}
+.personal-class, .parents-class{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.link a{
+    padding: 10px 30px;
+    background: #F5C826;
+    border: none;
+    border-radius: 10px;
+    color:white;
+    font-family:"arial";
+    font-size: 17px;
+    text-decoration: none;
     font-weight: bold;
-}
-.infodisplay{
-    width: 100%;
     display: flex;
-    justify-content: center;
+    margin-top: 40px;
 }
-.graduation-cap-parent{
-    margin-top: 70px;
-    padding-top: 30px;
-    background-color: white;
-    width: 250px;
-    height: 200px;
-    text-align: center;
-    font-size: 30px;
-}
-.hostel-parent{
-    margin-top: 70px;
-    margin-left: 100px;
-    padding-top: 42px;
-    background-color: white;
-    width: 250px;
-    height: 200px;
-    text-align: center;
-    font-size: 30px;
-}
-.management-parent{
-    margin-top: 70px;
-    margin-left: 100px;
-    padding-top: 42px;
-    background-color: white;
-    width: 250px;
-    height: 200px;
-    text-align: center;
-    font-size: 30px;
-}
-
 </style>
 <body>
+        
     <input type="checkbox" id="checkbox">
     <div class="header">
         <label for="checkbox">
@@ -319,6 +261,7 @@ $dbCon->close();
                 <i class="fa fa-user" aria-hidden="true"></i>
             </a>
         </div>
+		
     </div>
     <div class="body">
         <nav class="side-bar">
@@ -344,77 +287,38 @@ $dbCon->close();
                         <span style="padding-left:10px;">LOGOUT</span>
                     </a>
                 </li>
+                
             </ul>
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
-                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Dashboard</p>
+                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
             </div>
-            <div class="slider">
-                <div class="images">
-                    <input type="radio" name="slide" id="img1" checked>
-                    <input type="radio" name="slide" id="img2">
-                    <input type="radio" name="slide" id="img3">
-                    <input type="radio" name="slide" id="img4">
-
-                    <img src="maahad1.jpg" class="m1" alt="img1">
-                    <img src="maahad2.jpg" class="m2" alt="img2">
-                    <img src="maahad3.jpg" class="m3" alt="img3">
-                    <img src="maahad4.jpg" class="m4" alt="img4">
+            <div class="profile-wrapper">
+                <h2>PERSONAL INFORMATION</h2>
+                <hr>
+                <div class="personal-class">
+                <p><b>Full Name: </b> <?php echo $studentInfo['STUNAME']; ?></p>
+                    <p><b>Phone Number: </b> <?php echo $studentInfo['STUPNO']; ?></p>
+                    <p><b>Email: </b> <?php echo $studentInfo['STUEMAIL']; ?></p>
+                    <p><b>Date of Birth: </b> <?php echo $studentInfo['STUDOB']; ?></p>
+                    <p><b>Address : </b><?php echo $studentInfo['STUADDRESS']; ?></p>
                 </div>
-                <div class="dots">
-                    <label for="img1"></label>
-                    <label for="img2"></label>
-                    <label for="img3"></label>
-                    <label for="img4"></label>
-                </div>
-            </div>
-
-            <div class="latest-infographic">
-                <p>Latest Infographic</p>
-            </div>
-
-            <div class="infodisplay">
-                <div class="graduation-cap-parent">
-                    <span style="font-size: 60px;"><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
-                    <p>
-                        <span id="totalStudents" class="count-up"><?php echo $totalStudents; ?></span><br>Students
-                    </p>
-                </div>
-                <div class="management-parent">
-                    <span style="font-size: 50px;"><i class="fa fa-users" aria-hidden="true"></i></span>
-                    <p>
-                        <span id="totalClerks" class="count-up"><?php echo $totalClerks; ?></span><br>Clerks
-                    </p>
+                <hr>
+                <h2>PARENTS INFORMATION</h2>
+                <hr>
+                <div class="parents-class">
+                    <p><b>Father's Name : </b><?php echo $studentInfo['FATHERNAME']; ?></p>
+                    <p><b>Mother's Name : </b><?php echo $studentInfo['MOTHERNAME']; ?></p>
+                    <p><b>Salary : </b>RM <?php echo number_format($studentInfo['SALARY'], 2); ?></p>
                 </div>
             </div>
-            
-            <script>
-                function animateValue(id, start, end, duration) {
-                    var range = end - start;
-                    var current = start;
-                    var increment = end > start ? 1 : -1;
-                    var stepTime = Math.abs(Math.floor(duration / range));
-                    var obj = document.getElementById(id);
-                    var timer = setInterval(function() {
-                        current += increment;
-                        obj.innerHTML = current;
-                        if (current == end) {
-                            clearInterval(timer);
-                        }
-                    }, stepTime);
-                }
-
-                // Call the animation function after page load
-                window.onload = function() {
-                    var totalStudents = parseInt("<?php echo $totalStudents; ?>", 10);
-                    var totalClerks = parseInt("<?php echo $totalClerks; ?>", 10);
-
-                    animateValue("totalStudents", 0, totalStudents, 2000);
-                    animateValue("totalClerks", 0, totalClerks, 2000);
-                };
-            </script>
+            <div class="link">
+                <a href="editprofile.php">Edit</a>
+            </div>
         </section>
     </div>
+
 </body>
 </html>
+

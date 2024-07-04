@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once("dbConnect.php");
+require_once("../dbConnect.php");
 
 // Check if user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("location: welcome.php"); // Redirect to login page if not logged in
+    header("location: ../welcome.php"); // Redirect to login page if not logged in
     exit;
 }
 
