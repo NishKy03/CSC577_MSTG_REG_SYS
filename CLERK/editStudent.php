@@ -267,28 +267,28 @@ input[type="submit"]:hover
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-                <li >
+            <li>
                     <a href="ClerkDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">DASHBOARD</span>
+                        <span>DASHBOARD</span>
                     </a>
                 </li>
                 <li>
-                    <a href="studentprofile.php">
+                    <a href="ClerkProfile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">PROFILE</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="listofstudent.php">
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">LIST OF STUDENT</span>
+                        <span>PROFILE</span>
                     </a>
                 </li>
                 <li style="border-bottom: 1px solid grey;">
-                    <a href="logout.php">
+                    <a href="listclerk.php">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        <span>LIST OF CLERK</span>
+                    </a>
+                </li>
+                <li style="border-bottom: 1px solid grey;">
+                    <a href="../logout.php">
                         <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">LOGOUT</span>
+                        <span>LOGOUT</span>
                     </a>
                 </li>
             </ul>

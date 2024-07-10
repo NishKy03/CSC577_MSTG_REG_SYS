@@ -257,13 +257,13 @@ $dbCon->close();
             </div>
             <ul>
                 <li>
-                    <a href="AdminDashboard.php">
+                    <a href="ClerkDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
                         <span>DASHBOARD</span>
                     </a>
                 </li>
                 <li>
-                    <a href="AdminProfile.php">
+                    <a href="ClerkProfile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
                         <span>PROFILE</span>
                     </a>
@@ -275,7 +275,7 @@ $dbCon->close();
                     </a>
                 </li>
                 <li style="border-bottom: 1px solid grey;">
-                    <a href="logout.php">
+                    <a href="../logout.php">
                         <i class="fa fa-sign-out" aria-hidden="true"></i>
                         <span>LOGOUT</span>
                     </a>
