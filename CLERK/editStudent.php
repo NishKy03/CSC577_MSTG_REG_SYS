@@ -34,8 +34,7 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
-    <title>List of Students</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>View Student</title>
 </head>
 <style>
 * {
@@ -58,7 +57,7 @@ $dbCon->close();
 .header i {
 	font-size: 30px;
 	cursor: pointer;
-	color: #black;
+	color: white;
 }
 .header a{
     text-decoration: none;
@@ -151,7 +150,7 @@ $dbCon->close();
     display: flex; 
     align-items: center; 
     flex-direction: column;
-    
+    position: relative;
 }
 #navbtn {
     display: inline-block;
@@ -172,72 +171,81 @@ $dbCon->close();
 #checkbox:checked ~ .body .side-bar a span{
     display: none;
 }
-.circled-menu-parent{
-    background-color: #f7f7f7;
-    height: 60px;
-    font-size: 25px;
-    font-family: 'Inter';
-    font-weight: bold;
-    color: #434343;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    padding: 0 20px;
-    font-family: "Poppins", sans-serif;
-    border-bottom: 1px solid #ccc;
-}
-
-.circled-menu-parent p{
-    margin: 0; /* Remove default margins to prevent alignment issues */
-    display: flex; /* Use flexbox to align the icon and text */
-    align-items: center; /* Vertically center the icon and text */
-    font-size: 25px;
-    font-family: "Poppins", sans-serif;
-}
-
-.circled-menu-parent i {
-    margin-left: 20px;
-    margin-right: 15px; /* Space between the icon and text */
-}
-.profile-wrap{
-    width: 50%;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-top: 100px;
-    padding: 20px;
-}
-table{
-    width: 80%;
-    border-collapse: collapse;
+.form-wrapper{
     margin-top: 60px;
+    width: 80%;
+    position: relative;
 }
-table th, table td{
-    padding: 12px;
-    font-weight: bold;
+.personal-class {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    background: white;
+    overflow: hidden;
+    border-radius: 20px;
+    
 }
-table th{
-    background-color: #48332E;
+
+.personal-class th {
+    width: 100%;
+    font-size: 20px;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.05em;
+    background-color: #8D3A0B;
+    padding: 15px;
+    border-top-left-radius: 20px; /* Corrected property */
+    border-top-right-radius: 20px; /* Corrected property */
+    padding-left: 20px;
+    border-bottom: 1px solid #ccc; /* Add bottom border to table headers */
+    text-align: left;
+    overflow: hidden;
     color: white;
 }
-table tr:nth-child(even) {
-    background-color: white; /* Light grey background for even rows */
+
+.personal-class td {
+    padding: 15px;
+    font-size: 18px;
+    line-height: 1.5;
 }
-table tr:nth-child(odd) {
-    background-color: #BDB8B8; /* Light grey background for even rows */
+input[type="text"], input[type="date"], select {
+    padding: 10px 15px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 18px;
+    margin-bottom: 5px;
 }
-.action-icons{
-    display: flex;
-    justify-content: center; /* Center the icons horizontally */
-    gap: 10px;
+input[type="submit"]
+{
+    position: absolute;
+    padding: 10px 15px;
+    font-size: 18px;
+    background: #DCB012;
+    left: 84%;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 700;
+    border-radius: 5px;
+    color: #634711;
 }
-.action-icons a{
-    text-decoration: none;
-    color: #000;
-    font-size: 20px;
+input[type="submit"]:hover
+{
+    background-color: #C79D07;
 }
-.action-icons a:hover{
-    color: #127b8e;
+
+.back-button {
+    background: none;
+    border: none;
+    position: absolute;
+    font-size: 25px;
+    color: black;
+    left: 80px;
+    top: 60px;
+}
+.back-button a:hover{
+    color: grey;
 }
 </style>
 <body>
@@ -286,59 +294,77 @@ table tr:nth-child(odd) {
             </ul>
         </nav>
         <section class="section-1">
-            <div class="circled-menu-parent">
-                <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Student</p>
-            </div>
-            <table>
-                <tr>
-                    <th>#</th>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                <?php
-                if ($result->num_rows > 0) {
-                    $count = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td style='text-align: center'>" . $count++ . "</td>";
-                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STUID']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['STUNAME']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['STUEMAIL']) . "</td>";
-                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STATUS']) . "</td>";
-                        echo "<td class='action-icons'>";
-                        echo "<a href='viewstudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-                        echo "<a href='editStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-pencil' aria-hidden='true'></i></a>";
-                        echo "<a href='javascript:void(0);' onclick='deleteStudent(\"" . htmlspecialchars($row['STUID']) . "\", \"" . htmlspecialchars($row['STUNAME']) . "\");'><i class='fa fa-trash' aria-hidden='true'></i></a>";
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6' style='text-align: center;'>No student's record found</td></tr>";
-                }
-                ?>
-            </table>
+            <button class="back-button"><a href="listofstudent.php"><i class="fa fa-arrow-left" aria-hidden="true"></i></a></button>
+                <form action="" class="form-wrapper">
+                    <table class="personal-class">
+                        <tr>
+                            <th colspan="2">
+                                Personal Details
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Name <span style="color: red;">*</span></b><br>
+                                <input type="text" name="STUNAME" required>
+                            </td>
+                            <td>
+                                <b>Phone Number <span style="color: red;">*</span></b><br>
+                                <input type="text" name="STUNAME" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Date of Birth <span style="color: red;">*</span></b><br>
+                                <input type="date" name="STUDOB" required>
+                            </td>
+                            <td>
+                                <b>Gender <span style="color: red;">*</span></b><br>
+                                <select name="STUGENDER" id="STUGENDER" required>
+                                    <option value="m">Male</option>
+                                    <option value="f">Female</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Address <span style="color: red;">*</span></b><br>
+                                <input type="text" name="STUADDRESS" required>
+                            </td>
+                            <td>
+                                <b>Email<span style="color: red;">*</span></b><br>
+                                <input type="text" name="STUEMAIL" required>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="personal-class">
+                        <tr>
+                            <th colspan="2">
+                                Parents Details
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Father Name <span style="color: red;">*</span></b><br>
+                                <input type="text" name="FATHERNAME" required>
+                            </td>
+                            <td>
+                                <b>Mother Name <span style="color: red;">*</span></b><br>
+                                <input type="text" name="MOTHERNAME" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Salary (RM)<span style="color: red;">*</span></b><br>
+                                <input type="text" name="SALARY" required>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </table>
+                    <input type="submit" value="Update Information">
+                </form>
         </section>
     </div>
-
-    <script>
-    function deleteStudent(studentId, studentName) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You are about to delete " + studentName + "'s record. This action cannot be undone.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'deleteStudent.php?id=' + studentId;
-            }
-        });
-    }
-    </script>
 </body>
 </html>
+
