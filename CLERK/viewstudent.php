@@ -21,6 +21,9 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
+$sql = "SELECT * FROM student";
+$result = $dbCon->query($sql);
+
 $dbCon->close();
 ?>
 
@@ -31,7 +34,7 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
-    <title>Clerk Profile</title>
+    <title>View Student</title>
 </head>
 <style>
 * {
@@ -147,7 +150,6 @@ $dbCon->close();
     display: flex; 
     align-items: center; 
     flex-direction: column;
-    
 }
 #navbtn {
     display: inline-block;
@@ -168,100 +170,69 @@ $dbCon->close();
 #checkbox:checked ~ .body .side-bar a span{
     display: none;
 }
-.circled-menu-parent{
-    background-color: #f7f7f7;
-    height: 60px;
-    font-size: 25px;
-    font-family: 'Inter';
-    font-weight: bold;
-    color: #434343;
-    width: 100%;
+.profile-wrap {
+    width: 80%;
+    background-color: white;
     display: flex;
+    align-items: center;
     justify-content: center;
-    flex-direction: column;
-    padding: 0 20px;
-    font-family: "Poppins", sans-serif;
-    border-bottom: 1px solid #ccc;
+    flex-direction: column; /* Added to stack items vertically */
+    padding: 20px; /* Added padding for spacing */
+    margin-top: 60px;
+    position: relative;
 }
 
-.circled-menu-parent p{
-    margin: 0; /* Remove default margins to prevent alignment issues */
-    display: flex; /* Use flexbox to align the icon and text */
-    align-items: center; /* Vertically center the icon and text */
-    font-size: 25px;
-    font-family: "Poppins", sans-serif;
+.back-button {
+    background: none;
+    border: none;
+    position: absolute;
+    top: 20px; /* Adjust top position */
+    left: 40px; /* Adjust left position */
+    font-size: 30px;
+    color: black;
 }
-
-.circled-menu-parent i {
-    margin-left: 20px;
-    margin-right: 15px; /* Space between the icon and text */
+.back-button a:hover{
+    color: grey;
 }
-.profile-wrap{
-    width: 50%;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-top: 100px;
-    padding: 20px;
+.image-frame {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 5%;
+    margin-bottom: 20px;
+    border: 2px solid #BF612D;
+    display: flex;
+    margin-top: 20px;
 }
-table{
+.image-frame img {
     width: 100%;
+    height: auto;
 }
-.image-wrap {
-    width: 250px;
-    height: 250px;
-    border: 4px solid #7360ff;
-    box shadow: 0 0 10px rgba(0,0,0,0.3);
-    border-radius: 10%;
-    overflow: hidden; 
-    margin-left: 40px;
+.table-class {
+    margin-top: 20px;
+    width: 80%;
+    border-collapse: collapse; /* Ensure borders collapse properly */
 }
 
-.image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire area while maintaining aspect ratio */
-    object-position: center; /* Centers the image within the frame */
+.table-class th {
+    font-size: 20px;
+    background-color: #A39F9F;
+    padding: 10px;
+    border-bottom: 1px solid #ccc; /* Add bottom border to table headers */
 }
 
-table tr td{
-    padding: 10px 15px;
+.table-class td {
+    padding: 13px 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc; /* Add bottom border to table cells */
 }
-.clerkinput{
-    width: 300px;
-    line-height: 1.5;
-    margin-top: 15px;
-}
-.clerkinput1{
-    width: 300px;
-    line-height: 1.5;
-    margin-top: 40px;
-}
-.clerkinput span, .clerkinput1 span{
-    color: #808080;
-    font-weight: 600;
-}
-.edit-button{
-    display: inline-flex;
-    background-color: #7360ff;
-    padding: 10px 15px;
-    margin-top: 5px;
-    border-radius: 10px;
-    transition: background-color 0.3s ease;
-    margin-left: 53%;
-    margin-top: 40px;
 
+.table-class tr {
+    border-bottom: 1px solid #ccc; /* Add bottom border to all table rows */
 }
-.edit-button a {
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 600;
-    color: white;
-}
-.edit-button i{
-    margin-right: 8px;
-}
-.edit-button:hover{
-    background-color: #5a47d8;
+
+.table-class td:first-child {
+    width: 300px; /* Adjust the width of the first column */
 }
 </style>
 <body>
@@ -283,14 +254,14 @@ table tr td{
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-            <li >
+                <li >
                     <a href="ClerkDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
                         <span style="padding-left:10px;">DASHBOARD</span>
                     </a>
                 </li>
                 <li>
-                    <a href="ClerkProfile.php">
+                    <a href="studentprofile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
                         <span style="padding-left:10px;">PROFILE</span>
                     </a>
@@ -310,52 +281,53 @@ table tr td{
             </ul>
         </nav>
         <section class="section-1">
-            <div class="circled-menu-parent">
-                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
-            </div>
             <div class="profile-wrap">
-                <table>
+                <button class="back-button"><a href="listofstudent.php"><i class="fa fa-arrow-left" aria-hidden="true"></i></a></button>
+                <div class="image-frame">
+                    <img src="../danishpic.png" alt="Student Image">
+                </div>
+                <table class="table-class">
                     <tr>
-                        <td>
-                            <div class="image-wrap">
-                                <img src="../danishpic.png" alt="Profile Image">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="clerkinput1">
-                                <p>
-                                    <b>ID :</b><br>
-                                    <span>10000</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Name :</b><br>
-                                    <span>Nurul Izzah Irdina Binti Mohd Kairudin</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Phone Number :</b><br>
-                                    <span>013-2874561</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Email :</b><br>
-                                    <span>irdinan91@gmail.com</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Date of Birth :</b><br>
-                                    <span>27-06-2001</span>
-                                </p>
-                            </div>
-                            <div class="edit-button">
-                                <a href="editclerkprofile.php"><i class="fa fa-pencil" aria-hidden="true"></i>Edit Profile</a>
-                            </div>
-                        </td>
+                        <th colspan="2">STUDENT 'S INFORMATION</th>
+                    </tr>
+                    <tr>
+                        <td><b>Student ID</b></td>
+                        <td>102</td>
+                    </tr>
+                    <tr>
+                        <td><b>Name</b></td>
+                        <td>Danish Haikal Bin Suhaimi</td>
+                    </tr>
+                    <tr>
+                        <td><b>Email</b></td>
+                        <td>danish151003@gmail.com</td>
+                    </tr>
+                    <tr>
+                        <td><b>Date of Birth</b></td>
+                        <td>15-10-2003</td>
+                    </tr>
+                    <tr>
+                        <td><b>Phone Number</b></td>
+                        <td>011-26269760</td>
+                    </tr>
+                    <tr>
+                        <td><b>Gender</b></td>
+                        <td>Male</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">PARENT 'S INFORMATION</th>
+                    </tr>
+                    <tr>
+                        <td><b>Father Name</b></td>
+                        <td>Suhaimi Bin Saad</td>
+                    </tr>
+                    <tr>
+                        <td><b>Mother Name</b></td>
+                        <td>Nurliza Bin Abdullah</td>
+                    </tr>
+                    <tr>
+                        <td><b>Salary</b></td>
+                        <td>RM10,000</td>
                     </tr>
                 </table>
             </div>
@@ -363,3 +335,4 @@ table tr td{
     </div>
 </body>
 </html>
+

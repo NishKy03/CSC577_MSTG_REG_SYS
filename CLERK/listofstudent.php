@@ -21,6 +21,9 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
+$sql = "SELECT * FROM student";
+$result = $dbCon->query($sql);
+
 $dbCon->close();
 ?>
 
@@ -31,7 +34,7 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
-    <title>Clerk Profile</title>
+    <title>Edit Profile</title>
 </head>
 <style>
 * {
@@ -204,64 +207,36 @@ $dbCon->close();
     padding: 20px;
 }
 table{
-    width: 100%;
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 60px;
 }
-.image-wrap {
-    width: 250px;
-    height: 250px;
-    border: 4px solid #7360ff;
-    box shadow: 0 0 10px rgba(0,0,0,0.3);
-    border-radius: 10%;
-    overflow: hidden; 
-    margin-left: 40px;
+table th, table td{
+    padding: 12px;
+    font-weight: bold;
 }
-
-.image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire area while maintaining aspect ratio */
-    object-position: center; /* Centers the image within the frame */
-}
-
-table tr td{
-    padding: 10px 15px;
-}
-.clerkinput{
-    width: 300px;
-    line-height: 1.5;
-    margin-top: 15px;
-}
-.clerkinput1{
-    width: 300px;
-    line-height: 1.5;
-    margin-top: 40px;
-}
-.clerkinput span, .clerkinput1 span{
-    color: #808080;
-    font-weight: 600;
-}
-.edit-button{
-    display: inline-flex;
-    background-color: #7360ff;
-    padding: 10px 15px;
-    margin-top: 5px;
-    border-radius: 10px;
-    transition: background-color 0.3s ease;
-    margin-left: 53%;
-    margin-top: 40px;
-
-}
-.edit-button a {
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 600;
+table th{
+    background-color: #48332E;
     color: white;
 }
-.edit-button i{
-    margin-right: 8px;
+table tr:nth-child(even) {
+    background-color: white; /* Light grey background for even rows */
 }
-.edit-button:hover{
-    background-color: #5a47d8;
+table tr:nth-child(odd) {
+    background-color: #BDB8B8; /* Light grey background for even rows */
+}
+.action-icons{
+    display: flex;
+    justify-content: center; /* Center the icons horizontally */
+    gap: 10px;
+}
+.action-icons a{
+    text-decoration: none;
+    color: #000;
+    font-size: 20px;
+}
+.action-icons a:hover{
+    color: #127b8e;
 }
 </style>
 <body>
@@ -283,14 +258,14 @@ table tr td{
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-            <li >
+                <li >
                     <a href="ClerkDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
                         <span style="padding-left:10px;">DASHBOARD</span>
                     </a>
                 </li>
                 <li>
-                    <a href="ClerkProfile.php">
+                    <a href="studentprofile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
                         <span style="padding-left:10px;">PROFILE</span>
                     </a>
@@ -311,54 +286,39 @@ table tr td{
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
-                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
+                <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Student</p>
             </div>
-            <div class="profile-wrap">
-                <table>
-                    <tr>
-                        <td>
-                            <div class="image-wrap">
-                                <img src="../danishpic.png" alt="Profile Image">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="clerkinput1">
-                                <p>
-                                    <b>ID :</b><br>
-                                    <span>10000</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Name :</b><br>
-                                    <span>Nurul Izzah Irdina Binti Mohd Kairudin</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Phone Number :</b><br>
-                                    <span>013-2874561</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Email :</b><br>
-                                    <span>irdinan91@gmail.com</span>
-                                </p>
-                            </div>
-                            <div class="clerkinput">
-                                <p>
-                                    <b>Date of Birth :</b><br>
-                                    <span>27-06-2001</span>
-                                </p>
-                            </div>
-                            <div class="edit-button">
-                                <a href="editclerkprofile.php"><i class="fa fa-pencil" aria-hidden="true"></i>Edit Profile</a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                <?php
+                if ($result->num_rows > 0) {
+                    $count = 1;
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td style='text-align: center'>" . $count++ . "</td>";
+                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STUID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['STUNAME']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['STUEMAIL']) . "</td>";
+                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STATUS']) . "</td>";
+                        echo "<td class='action-icons'>";
+                        echo "<a href='viewstudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-eye' aria-hidden='true'></i></a>";
+                        echo "<a href='edit.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-pencil' aria-hidden='true'></i></a>";
+                        echo "<a href='delete.php?id=" . htmlspecialchars($row['STUID']) . "' onclick=\"return confirm('Are you sure you want to delete this item?');\"><i class='fa fa-trash' aria-hidden='true'></i></a>";
+                        echo "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='6'>No students found</td></tr>";
+                }
+                ?>
+            </table>
         </section>
     </div>
 </body>

@@ -303,7 +303,7 @@ table tr td{
                     </a>
                 </li>
                 <li>
-                    <a href="studentprofile.php">
+                    <a href="ClerkProfile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
                         <span style="padding-left:10px;">PROFILE</span>
                     </a>
