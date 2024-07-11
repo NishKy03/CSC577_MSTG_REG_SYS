@@ -308,7 +308,7 @@ $dbCon->close();
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-                <li >
+            <li >
                     <a href="ClerkDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
                         <span style="padding-left:10px;">DASHBOARD</span>
@@ -322,7 +322,7 @@ $dbCon->close();
                 </li>
                 <li>
                     <a href="listofstudent.php">
-                        <i class="fa fa-user" aria-hidden="true"></i>
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                         <span style="padding-left:10px;">LIST OF STUDENT</span>
                     </a>
                 </li>

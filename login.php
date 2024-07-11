@@ -46,9 +46,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $_SESSION['loggedin'] = true;
                         $_SESSION['username'] = $row['CLERKID'];
                         if ($row['CLERKTYPE'] == 'admin') {
-                            header("location: AdminDashboard.php");
+                            header("location: ADMIN/AdminDashboard.php");
                         } else {
-                            header("location: ClerkDashboard.php");
+                            header("location: CLERK/ClerkDashboard.php");
                         }
                         exit();
                     } else {

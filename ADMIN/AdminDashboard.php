@@ -21,9 +21,6 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
-$sql = "SELECT * FROM student";
-$result = $dbCon->query($sql);
-
 $dbCon->close();
 ?>
 
@@ -34,8 +31,7 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
-    <title>List of Students</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Clerk Profile</title>
 </head>
 <style>
 * {
@@ -48,7 +44,7 @@ $dbCon->close();
 	display: flex;
 	align-items: center;
 	padding: 28px 30px;
-	background: #BF612D;
+	background: #EFD577;
 	color: white;
 }
 .welcome-name {
@@ -58,7 +54,7 @@ $dbCon->close();
 .header i {
 	font-size: 30px;
 	cursor: pointer;
-	color: #black;
+	color: black;
 }
 .header a{
     text-decoration: none;
@@ -112,7 +108,7 @@ $dbCon->close();
 }
 
 .side-bar ul li:hover {
-    background: #48332E;
+    background: #EFD577;
     font-weight: bold;
 }
 .side-bar ul li:hover > ul {
@@ -208,36 +204,64 @@ $dbCon->close();
     padding: 20px;
 }
 table{
-    width: 80%;
-    border-collapse: collapse;
-    margin-top: 60px;
+    width: 100%;
 }
-table th, table td{
-    padding: 12px;
-    font-weight: bold;
+.image-wrap {
+    width: 250px;
+    height: 250px;
+    border: 4px solid #7360ff;
+    box shadow: 0 0 10px rgba(0,0,0,0.3);
+    border-radius: 10%;
+    overflow: hidden; 
+    margin-left: 40px;
 }
-table th{
-    background-color: #48332E;
+
+.image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the entire area while maintaining aspect ratio */
+    object-position: center; /* Centers the image within the frame */
+}
+
+table tr td{
+    padding: 10px 15px;
+}
+.clerkinput{
+    width: 300px;
+    line-height: 1.5;
+    margin-top: 15px;
+}
+.clerkinput1{
+    width: 300px;
+    line-height: 1.5;
+    margin-top: 40px;
+}
+.clerkinput span, .clerkinput1 span{
+    color: #808080;
+    font-weight: 600;
+}
+.edit-button{
+    display: inline-flex;
+    background-color: #7360ff;
+    padding: 10px 15px;
+    margin-top: 5px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    margin-left: 53%;
+    margin-top: 40px;
+
+}
+.edit-button a {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
     color: white;
 }
-table tr:nth-child(even) {
-    background-color: white; /* Light grey background for even rows */
+.edit-button i{
+    margin-right: 8px;
 }
-table tr:nth-child(odd) {
-    background-color: #BDB8B8; /* Light grey background for even rows */
-}
-.action-icons{
-    display: flex;
-    justify-content: center; /* Center the icons horizontally */
-    gap: 10px;
-}
-.action-icons a{
-    text-decoration: none;
-    color: #000;
-    font-size: 20px;
-}
-.action-icons a:hover{
-    color: #127b8e;
+.edit-button:hover{
+    background-color: #5a47d8;
 }
 </style>
 <body>
@@ -246,12 +270,6 @@ table tr:nth-child(odd) {
         <label for="checkbox">
             <i id="navbtn" class="fa fa-bars" aria-hidden="true"></i>
         </label>
-        <h2 class="welcome-name">Welcome <span style="color: #48332E;"><?php echo htmlspecialchars($firstName); ?></span> !</h2>
-        <div class="right-icon">
-            <a href="studentprofile.php">
-                <i class="fa fa-user" aria-hidden="true"></i>
-            </a>
-        </div>
     </div>
     <div class="body">
         <nav class="side-bar">
@@ -259,86 +277,38 @@ table tr:nth-child(odd) {
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-                <li >
-                    <a href="ClerkDashboard.php">
+                <li>
+                    <a href="AdminDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">DASHBOARD</span>
+                        <span>DASHBOARD</span>
                     </a>
                 </li>
                 <li>
-                    <a href="ClerkProfile.php">
+                    <a href="adminprofile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">PROFILE</span>
+                        <span>PROFILE</span>
                     </a>
                 </li>
-                <li>
-                    <a href="listofstudent.php">
+                <li style="border-bottom: 1px solid grey;">
+                    <a href="listofclerk.php">
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">LIST OF STUDENT</span>
+                        <span>LIST OF CLERK</span>
                     </a>
                 </li>
                 <li style="border-bottom: 1px solid grey;">
                     <a href="../logout.php">
                         <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">LOGOUT</span>
+                        <span>LOGOUT</span>
                     </a>
                 </li>
             </ul>
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
-                <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Student</p>
+                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Dashboard</p>
             </div>
-            <table>
-                <tr>
-                    <th>#</th>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                <?php
-                if ($result->num_rows > 0) {
-                    $count = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td style='text-align: center'>" . $count++ . "</td>";
-                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STUID']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['STUNAME']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['STUEMAIL']) . "</td>";
-                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STATUS']) . "</td>";
-                        echo "<td class='action-icons'>";
-                        echo "<a href='viewstudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-                        echo "<a href='editStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-pencil' aria-hidden='true'></i></a>";
-                        echo "<a href='javascript:void(0);' onclick='deleteStudent(\"" . htmlspecialchars($row['STUID']) . "\", \"" . htmlspecialchars($row['STUNAME']) . "\");'><i class='fa fa-trash' aria-hidden='true'></i></a>";
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6' style='text-align: center;'>No student's record found</td></tr>";
-                }
-                ?>
-            </table>
+            <h2 class="welcome-name">Welcome back, Admin <span style="color: #48332E;"><?php echo htmlspecialchars($firstName); ?></span> !</h2>
         </section>
     </div>
-
-    <script>
-    function deleteStudent(studentId, studentName) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You are about to delete " + studentName + "'s record. This action cannot be undone.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'deleteStudent.php?id=' + studentId;
-            }
-        });
-    }
-    </script>
 </body>
 </html>

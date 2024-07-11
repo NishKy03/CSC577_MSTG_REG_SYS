@@ -9,17 +9,25 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $username = $_SESSION['username'];
 
-// Fetch the student's full name
-$sql = "SELECT CLERKNAME FROM clerk WHERE CLERKID = ?";
-$stmt = $dbCon->prepare($sql);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$stmt->store_result();
-$stmt->bind_result($fullName);
-$stmt->fetch();
-$stmt->close();
+// Fetch the list of clerks
+$sql = "SELECT CLERKID, CLERKNAME, CLERKEMAIL, CLERKIMAGE FROM clerk";
+$result = $dbCon->query($sql);
 
-$firstName = strtoupper(strtok($fullName, ' '));
+$clerks = array();
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        // Extract the first two words from the CLERKNAME
+        $fullName = $row['CLERKNAME'];
+        $words = explode(' ', $fullName);
+        $firstTwoWords = implode(' ', array_slice($words, 0, 2));
+        
+        // Assign the modified name back to the row
+        $row['CLERKNAME'] = $firstTwoWords;
+
+        // Store the modified row in the clerks array
+        $clerks[] = $row;
+    }
+}
 
 $dbCon->close();
 ?>
@@ -31,7 +39,7 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
-    <title>Edit Profile</title>
+    <title>List of Clerk</title>
 </head>
 <style>
 * {
@@ -44,7 +52,7 @@ $dbCon->close();
 	display: flex;
 	align-items: center;
 	padding: 28px 30px;
-	background: #BF612D;
+	background: #EFD577;
 	color: white;
 }
 .welcome-name {
@@ -54,7 +62,7 @@ $dbCon->close();
 .header i {
 	font-size: 30px;
 	cursor: pointer;
-	color: #black;
+	color: black;
 }
 .header a{
     text-decoration: none;
@@ -108,7 +116,7 @@ $dbCon->close();
 }
 
 .side-bar ul li:hover {
-    background: #48332E;
+    background: #EFD577;
     font-weight: bold;
 }
 .side-bar ul li:hover > ul {
@@ -196,85 +204,122 @@ $dbCon->close();
     margin-left: 20px;
     margin-right: 15px; /* Space between the icon and text */
 }
-.profile-wrap{
-    width: 50%;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-top: 100px;
-    padding: 20px;
-}
-table{
+.line1{
+    display: flex;
     width: 100%;
+    justify-content: right;
+    align-items: center;
+
 }
-table tr td{
+.search-bar {
+    margin-top: 20px;
     padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+}
+.search-bar input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
     font-size: 18px;
+    padding: 8px;
 }
-.cancel-button{
-    width: 90px;
-    border: 2px solid #7360ff;
-    padding: 10px 15px;
-    margin-top: 5px;
-    border-radius: 10px;
+.search-bar button {
     background-color: transparent;
+    color: grey;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 10px;
 }
-.cancel-button a {
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 600;
+.search-bar i{
+    font-size: 20px;
+}
+.search-bar button:hover {
     color: black;
 }
-.cancel-button i{
-    margin-right: 8px;
-}
-.cancel-button:hover
-{
-    background-color: #7360ff;
-}
-.cancel-button a:hover
-{
-    color: white;
-}
-.profile-wrap input[type="text"], .profile-wrap input[type="date"]{
+.add-clerk {
+    background-color: #4C1CD5;
+    margin-right: 40px;
+    margin-left: 40px;
+    margin-top: 15px;
+    border-radius: 15px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px 15px;
-    width: 100%;
-    font-size: 18px;
-    border-radius: 10px;
-    outline: none;
-    border: 1px solid #ccc;
-}
-.profile-wrap input[type="file"]
-{
-    font-size: 15px;
-    cursor: pointer;
-}
-.profile-wrap input[type="submit"]
-{
-    width: 90px;
-    padding: 10px 15px;
+    transition: background-color 0.3s; /* Added transition for background color change */
     color: white;
-    font-size: 17px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    margin-right: 20px;
-    background-color: #7360ff;
-    transition: background-color 0.3s ease;
-    border-radius: 10px;
-}
-.profile-wrap input[type="submit"]:hover{
-    background-color: #5a47d8;
-}
-/* Add this class to center elements within a table cell */
-.center-buttons {
-    text-align: center;
+    text-decoration: none; /* Ensure it behaves like a button or link */
 }
 
-.profile-wrap input[type="submit"],
-.profile-wrap .cancel-button {
-    display: inline-block;
-    width: auto; /* Adjust width to fit content */
-    margin: 10px 5px; /* Optional: Add margin for spacing */
+.add-clerk:hover {
+    background-color: #5e28e4; /* Darker shade on hover */
+    color: white; /* Ensure text remains white on hover */
+}
+
+.add-clerk a{
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    padding: 10px 15px;
+}
+.add-clerk i{
+    margin-right: 5px;
+}
+.list-clerk{
+    width: 80%;
+    background: #E7E4E4;
+    padding: 30px;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+.clerk-profile {
+    width: 350px;
+    background: #fff;
+    display: flex;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adding a subtle shadow */
+}
+
+.image-wrap{
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    margin-left: 10px;
+}
+.image-wrap img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.clerk-profile table{
+    margin-left: 20px;
+    width: 200px;
+    
+}
+.clerk-profile table th{
+    font-size: 20px;
+    font-family: "Poppins", sans-serif;
+    text-align: left;
+}
+.clerk-profile table td{
+    font-size: 15px;
+    font-family: "Poppins", sans-serif;
+    text-align: left;
+    line-height: 1.5;
+}
+.clerk-profile a{
+    text-decoration: none;
+    font-weight: bold;
+}
+.clerk-profile a:hover{
+    color: grey;
 }
 </style>
 <body>
@@ -283,12 +328,6 @@ table tr td{
         <label for="checkbox">
             <i id="navbtn" class="fa fa-bars" aria-hidden="true"></i>
         </label>
-        <h2 class="welcome-name">Welcome <span style="color: #48332E;"><?php echo htmlspecialchars($firstName); ?></span> !</h2>
-        <div class="right-icon">
-            <a href="studentprofile.php">
-                <i class="fa fa-user" aria-hidden="true"></i>
-            </a>
-        </div>
     </div>
     <div class="body">
         <nav class="side-bar">
@@ -296,72 +335,71 @@ table tr td{
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-                <li >
-                    <a href="ClerkDashboard.php">
+                <li>
+                    <a href="AdminDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">DASHBOARD</span>
+                        <span>DASHBOARD</span>
                     </a>
                 </li>
                 <li>
-                    <a href="ClerkProfile.php">
+                    <a href="adminprofile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">PROFILE</span>
+                        <span>PROFILE</span>
                     </a>
                 </li>
-                <li>
-                    <a href="listofstudent.php">
+                <li style="border-bottom: 1px solid grey;">
+                    <a href="listofclerk.php">
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">LIST OF STUDENT</span>
+                        <span>LIST OF CLERK</span>
                     </a>
                 </li>
                 <li style="border-bottom: 1px solid grey;">
                     <a href="../logout.php">
                         <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        <span style="padding-left:10px;">LOGOUT</span>
+                        <span>LOGOUT</span>
                     </a>
                 </li>
             </ul>
-            
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
-                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
+                <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Clerk</p>
             </div>
-            <div class="profile-wrap">
-                <form action="">
-                    <table>
-                        <tr>
-                            <td><b>ID : </b></td>
-                            <td>10000</td>
-                        </tr>
-                        <tr>
-                            <td><b>Name : </b></td>
-                            <td><input type="text" name="CLERKNAME"></td>
-                        </tr>
-                        <tr>
-                            <td><b>Phone Number : </b></td>
-                            <td><input type="text" name="CLERKPHONENO"></td>
-                        </tr>
-                        <tr>
-                            <td><b>Email :</b></td>
-                            <td><input type="text" name="CLERKEMAIL"></td>
-                        </tr>
-                        <tr>
-                            <td><b>Date of Birth :</b></td>
-                            <td><input type="date" name="CLERKDOB"></td>
-                        </tr>
-                        <tr>
-                            <td><b>Profile Image :</b></td>
-                            <td><input type="file" id="profile_image" name="profile_image" accept="image/*"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="center-buttons">
-                                <input type="submit" value="Save">
-                                <button class="cancel-button"><a href="ClerkProfile.php">Cancel</a></button>
-                            </td>
-                        </tr>
-                    </table>
-                </form>
+            <div class="line1">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search here">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </div>
+                <div class="add-clerk">
+                    <a href="addclerk.php"><i class="fa fa-user-plus" aria-hidden="true"></i>Add Clerk</a>
+                </div>
+            </div>
+            <div class="list-clerk">
+                <table border="1">
+                    <tr>
+                    <?php foreach ($clerks as $clerk): ?>
+                        <td>
+                            <div class="clerk-profile">
+                                <div class="image-wrap">
+                                <?php echo '<!-- ' . htmlspecialchars($clerk['CLERKIMAGE']) . ' -->'; ?>
+                                <img src="<?php echo htmlspecialchars($clerk['CLERKIMAGE']); ?>" alt="Profile Picture">
+                                </div>
+                                <table>
+                                    <tr>
+                                        <th><?php echo htmlspecialchars($clerk['CLERKNAME']); ?></th>
+                                    </tr>
+                                    <tr>
+                                        <td><span style="color: grey;"><?php echo $clerk['CLERKEMAIL']; ?></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="viewclerk.php?clerkid=<?php echo $clerk['CLERKID']; ?>">View Profile</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                        <?php endforeach; ?>
+                    </tr>
+                </table>
             </div>
         </section>
     </div>

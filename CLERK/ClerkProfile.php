@@ -283,28 +283,28 @@ table tr td{
                 <img src="../logo.png" alt=""/>
             </div>
             <ul>
-                <li>
+                <li >
                     <a href="ClerkDashboard.php">
                         <i class="fa fa-home" aria-hidden="true"></i>
-                        <span>DASHBOARD</span>
+                        <span style="padding-left:10px;">DASHBOARD</span>
                     </a>
                 </li>
                 <li>
                     <a href="ClerkProfile.php">
                         <i class="fa fa-user" aria-hidden="true"></i>
-                        <span>PROFILE</span>
+                        <span style="padding-left:10px;">PROFILE</span>
                     </a>
                 </li>
-                <li style="border-bottom: 1px solid grey;">
-                    <a href="listclerk.php">
+                <li>
+                    <a href="listofstudent.php">
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                        <span>LIST OF CLERK</span>
+                        <span style="padding-left:10px;">LIST OF STUDENT</span>
                     </a>
                 </li>
                 <li style="border-bottom: 1px solid grey;">
                     <a href="../logout.php">
                         <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        <span>LOGOUT</span>
+                        <span style="padding-left:10px;">LOGOUT</span>
                     </a>
                 </li>
             </ul>
