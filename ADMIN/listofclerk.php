@@ -10,7 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $username = $_SESSION['username'];
 
 // Fetch the list of clerks
-$sql = "SELECT CLERKID, CLERKNAME, CLERKEMAIL, CLERKIMAGE FROM clerk where CLERKTYPE='clerk'";
+$sql = "SELECT * FROM clerk where CLERKTYPE='clerk'";
 $result = $dbCon->query($sql);
 
 $clerks = array();
@@ -381,7 +381,7 @@ $dbCon->close();
                         <td>
                             <div class="clerk-profile">
                                 <div class="image-wrap">
-                                <?php echo '<!-- ' . htmlspecialchars($clerk['CLERKIMAGE']) . ' -->'; ?>
+                                <?php echo $clerk["CLERKIMAGE"]; ?>
                                 <img src="<?php echo htmlspecialchars($clerk['CLERKIMAGE']); ?>" alt="Profile Picture">
                                 </div>
                                 <table>
