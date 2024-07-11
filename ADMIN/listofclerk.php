@@ -24,6 +24,9 @@ if ($result->num_rows > 0) {
         // Assign the modified name back to the row
         $row['CLERKNAME'] = $firstTwoWords;
 
+        // Prepend '../' to the CLERKIMAGE path
+        $row['CLERKIMAGE'] = '../' . $row['CLERKIMAGE'];
+
         // Store the modified row in the clerks array
         $clerks[] = $row;
     }
@@ -375,13 +378,13 @@ $dbCon->close();
                 </div>
             </div>
             <div class="list-clerk">
-                <table border="1">
+                <table >
                     <tr>
                     <?php foreach ($clerks as $clerk): ?>
                         <td>
                             <div class="clerk-profile">
                                 <div class="image-wrap">
-                                <?php echo $clerk["CLERKIMAGE"]; ?>
+                                
                                 <img src="<?php echo htmlspecialchars($clerk['CLERKIMAGE']); ?>" alt="Profile Picture">
                                 </div>
                                 <table>
@@ -394,6 +397,7 @@ $dbCon->close();
                                     <tr>
                                         <td><a href="viewclerk.php?clerkid=<?php echo $clerk['CLERKID']; ?>">View Profile</a></td>
                                     </tr>
+                                    
                                 </table>
                             </div>
                         </td>
