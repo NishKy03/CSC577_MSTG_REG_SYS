@@ -10,7 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $username = $_SESSION['username'];
 
 // Fetch the list of clerks
-$sql = "SELECT CLERKID, CLERKNAME, CLERKEMAIL, CLERKIMAGE FROM clerk";
+$sql = "SELECT CLERKID, CLERKNAME, CLERKEMAIL, CLERKIMAGE FROM clerk where CLERKTYPE='clerk'";
 $result = $dbCon->query($sql);
 
 $clerks = array();
