@@ -275,7 +275,7 @@ $dbCon->close();
                     </a>
                 </li>
                 <li style="border-bottom: 1px solid grey;">
-                    <a href="../logout.php">
+                    <a href="logout.php">
                         <i class="fa fa-sign-out" aria-hidden="true"></i>
                         <span>LOGOUT</span>
                     </a>
