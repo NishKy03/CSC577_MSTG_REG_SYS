@@ -345,7 +345,7 @@ $dbCon->close();
                     </tr>
                     <tr>
                         <td><b>Salary</b></td>
-                        <td><?= isset($SALARY) ? $SALARY : 'NULL'?></td>
+                        <td><?= isset($SALARY) ? "RM ".$SALARY : 'NULL'?></td>
                     </tr>
                 </table>
             </div>

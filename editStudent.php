@@ -9,6 +9,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $username = $_SESSION['username'];
 
+$message = "";
+$STUNAME_err = $STUEMAIL_err = $STUPNO_err = $STUGENDER_err = $STUDOB_err = $STUADDRESS_err = $FATHERNAME_err= $MOTHERNAME_err = $SALARY_err = "";
+$STUNAME = $STUEMAIL = $STUPNO = $STUGENDER = $STUDOB = $STUADDRESS = $FATHERNAME = $MOTHERNAME = $SALARY = "";
+
 // Fetch the student's full name
 $sql = "SELECT CLERKNAME FROM clerk WHERE CLERKID = ?";
 $stmt = $dbCon->prepare($sql);
@@ -58,22 +62,78 @@ if($stmt1->execute()){
 $sql2 = "UPDATE student SET STUNAME = ?, STUPNO = ?, STUEMAIL = ?, STUPASSWORD = ?, STUGENDER = ?, STUDOB = ?, STUADDRESS = ?, FATHERNAME = ?, MOTHERNAME = ?, SALARY = ? WHERE STUID = ?";
 $stmt2 = $dbCon->prepare($sql2);
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $STUNAME = $_POST['STUNAME'];
-    $STUPNO = $_POST['STUPNO'];
-    $STUEMAIL = $_POST['STUEMAIL'];
-    $STUGENDER = $_POST['STUGENDER'];
-    $STUDOB = $_POST['STUDOB'];
-    $STUADDRESS = $_POST['STUADDRESS'];
-    $FATHERNAME = $_POST['FATHERNAME'];
-    $MOTHERNAME = $_POST['MOTHERNAME'];
-    $SALARY = $_POST['SALARY'];
+    if(empty(trim($_POST['STUNAME']))){
+        $STUNAME_err = "Please enter student's name.";
+    } else{
+        $STUNAME = trim($_POST['STUNAME']);
+        if(!preg_match("/^[a-zA-Z-' ]*$/", $STUNAME)){
+            $STUNAME_err = "Only letters and white space allowed.";
+        }
+    }
+    if(empty(trim($_POST['STUEMAIL']))){
+        $STUEMAIL_err = "Please enter student's email.";
+    } else{
+        $STUEMAIL = trim($_POST['STUEMAIL']);
+        if(!filter_var($STUEMAIL, FILTER_VALIDATE_EMAIL)){
+            $STUEMAIL_err = "Invalid email format.";
+        }
+    }
+    if(empty(trim($_POST['STUPNO']))){
+        $STUPNO_err = "Please enter student's phone number.";
+    } else{
+        $STUPNO = trim($_POST['STUPNO']);
+        if(!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $STUPNO)){
+            $STUPNO_err = "Phone Number must be in format 'XXX-XXXXXXXX' or 'XXX-XXXXXXX'";
+        }
+    }
+    if(empty(trim($_POST['STUADDRESS']))){
+        $STUADDRESS_err = "Please enter student's address.";
+    } else{
+        $STUADDRESS = trim($_POST['STUADDRESS']);
+    }
+    if(empty(trim($_POST['FATHERNAME']))){
+        $FATHERNAME_err = "Please enter father's name.";
+    } else{
+        $FATHERNAME = trim($_POST['FATHERNAME']);
+        if(!preg_match("/^[a-zA-Z-' ]*$/", $FATHERNAME)){
+            $FATHERNAME_err = "Only letters and white space allowed.";
+        }
+    }
+    if(empty(trim($_POST['MOTHERNAME']))){
+        $MOTHERNAME_err = "Please enter mother's name.";
+    } else{
+        $MOTHERNAME = trim($_POST['MOTHERNAME']);
+        if(!preg_match("/^[a-zA-Z-' ]*$/", $MOTHERNAME)){
+            $MOTHERNAME_err = "Only letters and white space allowed.";
+        }
+    }
+    if(empty(trim($_POST['SALARY']))){
+        $SALARY_err = "Please enter parent's salary.";
+    } else{
+        $SALARY = trim($_POST['SALARY']);
+        if(!preg_match("/^\d+(\.\d+)?$/", $SALARY)){
+            $SALARY_err = "Only numbers allowed.";
+        }
+    }
+    if(empty(trim($_POST['STUGENDER']))){
+        $STUGENDER_err = "Please select student gender.";
+    } else{ 
+        $STUGENDER = trim($_POST['STUGENDER']);
+    }
+    if(empty(trim($_POST['STUDOB']))){
+        $STUDOB_err = "Please enter student's date of birth.";
+    } else{
+        $STUDOB = trim($_POST['STUDOB']);
+    }
 
-    $stmt2->bind_param("ssssssssssi", $STUNAME, $STUPNO, $STUEMAIL, $STUPASSWORD, $STUGENDER, $STUDOB, $STUADDRESS, $FATHERNAME, $MOTHERNAME, $SALARY, $stuID);
-    if($stmt2->execute()){
-        echo "<script>alert('Student information updated successfully.');
-        window.location.href = 'listofstudent.php';</script>";
-    } else {
-        echo "<script>alert('Error: " . $stmt2->error . "');</script>";
+    if(empty($STUNAME_err) && empty($STUEMAIL_err) && empty($STUPNO_err) && empty($STUADDRESS_err) && empty($FATHERNAME_err) && empty($MOTHERNAME_err) && empty($SALARY_err) && empty($STUGENDER_err) && empty($STUDOB_err)){
+        $stmt2->bind_param("ssssssssssi", $STUNAME, $STUPNO, $STUEMAIL, $STUPASSWORD, $STUGENDER, $STUDOB, $STUADDRESS, $FATHERNAME, $MOTHERNAME, $SALARY, $stuID);
+        if($stmt2->execute()){
+            echo "<script>alert('Student information updated successfully.');
+            window.location.href = 'listofstudent.php';</script>";
+        } else{
+            echo "<script>alert('Error: " . $stmt2->error . "');</script>";
+        }
     }
 }
 ?>
@@ -298,6 +358,10 @@ input[type="submit"]:hover
 .back-button a:hover{
     color: grey;
 }
+.error {
+            color: red;
+            font-weight: bold;
+        }
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -356,35 +420,41 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUNAME" value="<?= isset($STUNAME) ? $STUNAME : ''; ?>" placeholder="Enter Student's Name" required>
+                                <input type="text" name="STUNAME" id="STUNAME" value="<?= isset($STUNAME) ? $STUNAME : ''; ?>" placeholder="Enter Student's Name" required>
+                                <span id="StuNameError" class="error"><?php echo $STUNAME_err?></span>
                             </td>
                             <td>
                                 <b>Phone Number <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUPNO" value="<?= isset($STUPNO) ? $STUPNO : ''; ?>" placeholder="Enter Student's Phone Number" required>
+                                <input type="text" name="STUPNO" id="STUPNO" value="<?= isset($STUPNO) ? $STUPNO : ''; ?>" placeholder="Enter Student's Phone Number" required>
+                                <span id="StuPNOError" class="error"><?php echo $STUPNO_err?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Date of Birth <span style="color: red;">*</span></b><br>
-                                <input type="date" name="STUDOB" value="<?= isset($STUDOB) ? $STUDOB : ''; ?>" placeholder="Enter Student's Date of Birth" required>
+                                <input type="date" name="STUDOB" id="STUDOB" value="<?= isset($STUDOB) ? $STUDOB : ''; ?>" placeholder="Enter Student's Date of Birth" required>
+                                <span id="StuDOB" class="error"><?php echo $STUDOB_err?></span>
                             </td>
                             <td>
                                 <b>Gender <span style="color: red;">*</span></b><br>
                                 <select name="STUGENDER" id="STUGENDER" required>
-                                    <option value="<?= isset($STUGENDER) ? $STUGENDER : ''; ?>" disabled selected><?= isset($STUGENDER) ? $STUGENDER : 'Select Gender'; ?></option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="" disabled <?= !isset($STUGENDER) ? 'selected' : ''; ?>>Select Gender</option>
+                                    <option value="Male" <?= (isset($STUGENDER) && $STUGENDER == 'Male') ? 'selected' : ''; ?>>Male</option>
+                                    <option value="Female" <?= (isset($STUGENDER) && $STUGENDER == 'Female') ? 'selected' : ''; ?>>Female</option>
                                 </select>
+                                <span id="StuGenderError" class="error"><?php echo $STUGENDER_err; ?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Address <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUADDRESS" value="<?= isset($STUADDRESS) ? $STUADDRESS : ''; ?>" placeholder="Enter Student's Address" required>
+                                <input type="text" name="STUADDRESS" id="STUADDRESS" value="<?= isset($STUADDRESS) ? $STUADDRESS : ''; ?>" placeholder="Enter Student's Address" required>
+                                <span id="StuAddressError" class="error"><?php echo $STUADDRESS_err?></span>
                             </td>
                             <td>
                                 <b>Email<span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUEMAIL" value="<?= isset($STUEMAIL)? $STUEMAIL: ''; ?>" placeholder="Enter Student's Email" required>
+                                <input type="text" name="STUEMAIL" id="STUEMAIL" value="<?= isset($STUEMAIL)? $STUEMAIL: ''; ?>" placeholder="Enter Student's Email" required>
+                                <span id="StuEmailError" class="error"><?php echo $STUEMAIL_err?></span>
                             </td>
                         </tr>
                     </table>
@@ -397,17 +467,20 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Father Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="FATHERNAME" value="<?= isset($FATHERNAME) ? $FATHERNAME : ''?>" placeholder="Enter Father's Name" required>
+                                <input type="text" name="FATHERNAME" id="FATHERNAME" value="<?= isset($FATHERNAME) ? $FATHERNAME : ''?>" placeholder="Enter Father's Name" required>
+                                <span id="FatherNameError" class="error"><?php echo $FATHERNAME_err?></span>
                             </td>
                             <td>
                                 <b>Mother Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="MOTHERNAME" value="<?= isset($MOTHERNAME) ? $MOTHERNAME : ''?>" placeholder="Enter Mother's Name" required>
+                                <input type="text" name="MOTHERNAME" id="MOTHERNAME" value="<?= isset($MOTHERNAME) ? $MOTHERNAME : ''?>" placeholder="Enter Mother's Name" required>
+                                <span id="MotherNameError" class="error"><?php echo $MOTHERNAME_err?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Salary (RM)<span style="color: red;">*</span></b><br>
-                                <input type="text" name="SALARY" value="<?= isset($SALARY) ? $SALARY : '' ?>" placeholder="Enter Parents' Salary" required>
+                                <input type="text" name="SALARY" id="SALARY" value="<?= isset($SALARY) ? $SALARY : '' ?>" placeholder="Enter Parents' Salary" required>
+                                <span id="SalaryError" class="error"><?php echo $SALARY_err?></span>
                             </td>
                             <td>
                             </td>
@@ -417,5 +490,144 @@ input[type="submit"]:hover
                 </form>
         </section>
     </div>
+    <script>
+        // Function to validate form fields on submit
+        function validateForm() {
+            var isValid = true;
+
+            // Validate Student's Name
+            var StuName = document.getElementById('STUNAME').value.trim();
+            if (!StuName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('StuNameError').innerHTML = 'Please enter a valid name (only letters and spaces, max 50 characters).';
+                isValid = false;
+            } else {
+                document.getElementById('StuNameError').innerHTML = '';
+            }
+
+            // Validate Student's Phone Number
+            var StuPhone = document.getElementById('STUPNO').value.trim();
+            if (!StuPhone.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
+                document.getElementById('StuPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
+                isValid = false;
+            } else {
+                document.getElementById('StuPNOError').innerHTML = '';
+            }
+
+            // Validate Student's Address
+            var StuAddress = document.getElementById('STUADDRESS').value.trim();
+            if (StuAddress === '') {
+                document.getElementById('StuAddressError').innerHTML = 'Please enter the student\'s address.';
+                isValid = false;
+            } else {
+                document.getElementById('StuAddressError').innerHTML = '';
+            }
+
+            // Validate Student's Email
+            var StuEmail = document.getElementById('STUEMAIL').value.trim();
+            if (!StuEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('StuEmailError').innerHTML = 'Invalid Email.';
+                isValid = false;
+            } else {
+                document.getElementById('StuEmailError').innerHTML = '';
+            }
+
+            // Validate Father Name
+            var FatherName = document.getElementById('FATHERNAME').value.trim();
+            if (!FatherName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('FatherNameError').innerHTML = 'Name must contain only letters and spaces.';
+                isValid = false;
+            } else {
+                document.getElementById('FatherNameError').innerHTML = '';
+            }
+
+            // Validate Mother Name
+            var MotherName = document.getElementById('MOTHERNAME').value.trim();
+            if (!MotherName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('MotherNameError').innerHTML = 'Name must contain only letters and spaces.';
+                isValid = false;
+            } else {
+                document.getElementById('MotherNameError').innerHTML = '';
+            }
+
+            // Validate Salary
+            function validateWeight() {
+                var salary = document.getElementById('SALARY').value.trim();
+                if (!salary.match(/^\d+(\.\d{1})?$/) || parseFloat(salary) <= 0) {
+                    document.getElementById('SalaryError').innerHTML = 'Please enter a valid salary (> 0).';
+                    return false;
+                } else {
+                    document.getElementById('SalaryError').innerHTML = '';
+                    return true;
+                }
+            }
+
+            return isValid;
+        }
+
+        // Real-time validation on input change
+        document.getElementById('STUNAME').addEventListener('input', function() {
+            var StuName = this.value.trim();
+            if (!StuName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('StuNameError').innerHTML = 'Please enter a valid name (only letters and spaces).';
+            } else {
+                document.getElementById('StuNameError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('STUPNO').addEventListener('input', function() {
+            var StuPNO = this.value.trim();
+            if (!StuPNO.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
+                document.getElementById('StuPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
+            } else {
+                document.getElementById('StuPNOError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('STUADDRESS').addEventListener('input', function() {
+            var StuAddress = this.value.trim();
+            if (StuAddress === '') {
+                document.getElementById('StuAddressError').innerHTML = 'Please enter the student\'s address.';
+            } else {
+                document.getElementById('StuAddressError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('STUEMAIL').addEventListener('input', function() {
+            var StuEmail = this.value.trim();
+            if (!StuEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('StuEmailError').innerHTML = 'Invalid Email.';
+            } else {
+                document.getElementById('StuEmailError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('FATHERNAME').addEventListener('input', function() {
+            var FatherName = this.value.trim();
+            if (!FatherName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('FatherNameError').innerHTML = 'Name must contain only letters and spaces.';
+            } else {
+                document.getElementById('FatherNameError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('MOTHERNAME').addEventListener('input', function() {
+            var MotherName = this.value.trim();
+            if (!MotherName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('MotherNameError').innerHTML = 'Name must contain only letters and spaces.';
+            } else {
+                document.getElementById('MotherNameError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('SALARY').addEventListener('input', function() {
+            var salary = this.value.trim();
+            if (!salary.match(/^\d+(\.\d{1,2})?$/) || parseFloat(salary) <= 0) {
+                document.getElementById('SalaryError').innerHTML = 'Please enter a valid salary (> 0).';
+            } else {
+                document.getElementById('SalaryError').innerHTML = '';
+            }
+        });
+
+    </script>   
 </body>
 </html>
