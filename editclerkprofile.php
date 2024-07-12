@@ -10,18 +10,34 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $username = $_SESSION['username'];
 
 // Fetch the student's full name
-$sql = "SELECT CLERKNAME FROM clerk WHERE CLERKID = ?";
+$sql = "SELECT CLERKNAME, CLERKPNO, CLERKDOB, CLERKEMAIL FROM clerk WHERE CLERKID = ?";
 $stmt = $dbCon->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($fullName);
+$stmt->bind_result($fullName, $phoneNo, $dob, $email);
 $stmt->fetch();
 $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
-$dbCon->close();
+if($_SERVER["REQUEST_METHOD"]== "POST"){
+    $CLERKNAME = $_POST['CLERKNAME'];
+    $CLERKPHONENO = $_POST['CLERKPHONENO'];
+    $CLERKEMAIL = $_POST['CLERKEMAIL'];
+    $CLERKDOB = $_POST['CLERKDOB'];
+    
+
+    $sql1 = "UPDATE clerk SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ? WHERE CLERKID = ?";
+    $stmt1 = $dbCon->prepare($sql1);
+    $stmt1->bind_param("sssss", $CLERKNAME, $CLERKPHONENO, $CLERKEMAIL, $CLERKDOB, $username);
+    if($stmt1->execute()){
+        echo "<script>alert('Profile updated successfully.');
+        window.location.href = 'ClerkProfile.php'</script>";
+    } else {
+        echo "<script>alert('Error updating profile.');</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -328,27 +344,27 @@ table tr td{
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
             </div>
             <div class="profile-wrap">
-                <form action="">
+                <form action="editclerkprofile.php" method="POST">
                     <table>
                         <tr>
                             <td><b>ID : </b></td>
-                            <td>10000</td>
+                            <td><?php echo $_SESSION['username']?></td>
                         </tr>
                         <tr>
                             <td><b>Name : </b></td>
-                            <td><input type="text" name="CLERKNAME"></td>
+                            <td><input type="text" name="CLERKNAME" value="<?php echo $fullName; ?>"></td>
                         </tr>
                         <tr>
                             <td><b>Phone Number : </b></td>
-                            <td><input type="text" name="CLERKPHONENO"></td>
+                            <td><input type="text" name="CLERKPHONENO" value="<?php echo $phoneNo; ?>"></td>
                         </tr>
                         <tr>
                             <td><b>Email :</b></td>
-                            <td><input type="text" name="CLERKEMAIL"></td>
+                            <td><input type="text" name="CLERKEMAIL" value="<?php echo $email; ?>"></td>
                         </tr>
                         <tr>
                             <td><b>Date of Birth :</b></td>
-                            <td><input type="date" name="CLERKDOB"></td>
+                            <td><input type="date" name="CLERKDOB" value="<?php echo $dob?>"></td>
                         </tr>
                         <tr>
                             <td><b>Profile Image :</b></td>
