@@ -359,9 +359,10 @@ input[type="submit"]:hover
     color: grey;
 }
 .error {
-            color: red;
-            font-weight: bold;
-        }
+    color: red;
+    font-weight: bold;
+    width: 100%;
+}
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -420,19 +421,19 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUNAME" id="STUNAME" value="<?= isset($STUNAME) ? $STUNAME : ''; ?>" placeholder="Enter Student's Name" required>
+                                <input type="text" name="STUNAME" id="STUNAME" value="<?= isset($STUNAME) ? $STUNAME : ''; ?>" placeholder="Enter Student's Name" required><br>
                                 <span id="StuNameError" class="error"><?php echo $STUNAME_err?></span>
                             </td>
                             <td>
                                 <b>Phone Number <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUPNO" id="STUPNO" value="<?= isset($STUPNO) ? $STUPNO : ''; ?>" placeholder="Enter Student's Phone Number" required>
+                                <input type="text" name="STUPNO" id="STUPNO" value="<?= isset($STUPNO) ? $STUPNO : ''; ?>" placeholder="Enter Student's Phone Number" required><br>
                                 <span id="StuPNOError" class="error"><?php echo $STUPNO_err?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Date of Birth <span style="color: red;">*</span></b><br>
-                                <input type="date" name="STUDOB" id="STUDOB" value="<?= isset($STUDOB) ? $STUDOB : ''; ?>" placeholder="Enter Student's Date of Birth" required>
+                                <input type="date" name="STUDOB" id="STUDOB" value="<?= isset($STUDOB) ? $STUDOB : ''; ?>" placeholder="Enter Student's Date of Birth" required><br>
                                 <span id="StuDOB" class="error"><?php echo $STUDOB_err?></span>
                             </td>
                             <td>
@@ -448,12 +449,12 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Address <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUADDRESS" id="STUADDRESS" value="<?= isset($STUADDRESS) ? $STUADDRESS : ''; ?>" placeholder="Enter Student's Address" required>
+                                <input type="text" name="STUADDRESS" id="STUADDRESS" value="<?= isset($STUADDRESS) ? $STUADDRESS : ''; ?>" placeholder="Enter Student's Address" required><br>
                                 <span id="StuAddressError" class="error"><?php echo $STUADDRESS_err?></span>
                             </td>
                             <td>
                                 <b>Email<span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUEMAIL" id="STUEMAIL" value="<?= isset($STUEMAIL)? $STUEMAIL: ''; ?>" placeholder="Enter Student's Email" required>
+                                <input type="text" name="STUEMAIL" id="STUEMAIL" value="<?= isset($STUEMAIL)? $STUEMAIL: ''; ?>" placeholder="Enter Student's Email" required><br>
                                 <span id="StuEmailError" class="error"><?php echo $STUEMAIL_err?></span>
                             </td>
                         </tr>
@@ -467,19 +468,19 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Father Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="FATHERNAME" id="FATHERNAME" value="<?= isset($FATHERNAME) ? $FATHERNAME : ''?>" placeholder="Enter Father's Name" required>
+                                <input type="text" name="FATHERNAME" id="FATHERNAME" value="<?= isset($FATHERNAME) ? $FATHERNAME : ''?>" placeholder="Enter Father's Name" required><br>
                                 <span id="FatherNameError" class="error"><?php echo $FATHERNAME_err?></span>
                             </td>
                             <td>
                                 <b>Mother Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="MOTHERNAME" id="MOTHERNAME" value="<?= isset($MOTHERNAME) ? $MOTHERNAME : ''?>" placeholder="Enter Mother's Name" required>
+                                <input type="text" name="MOTHERNAME" id="MOTHERNAME" value="<?= isset($MOTHERNAME) ? $MOTHERNAME : ''?>" placeholder="Enter Mother's Name" required><br>
                                 <span id="MotherNameError" class="error"><?php echo $MOTHERNAME_err?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Salary (RM)<span style="color: red;">*</span></b><br>
-                                <input type="text" name="SALARY" id="SALARY" value="<?= isset($SALARY) ? $SALARY : '' ?>" placeholder="Enter Parents' Salary" required>
+                                <input type="text" name="SALARY" id="SALARY" value="<?= isset($SALARY) ? $SALARY : '' ?>" placeholder="Enter Parents' Salary" required><br>
                                 <span id="SalaryError" class="error"><?php echo $SALARY_err?></span>
                             </td>
                             <td>
@@ -507,7 +508,7 @@ input[type="submit"]:hover
             // Validate Student's Phone Number
             var StuPhone = document.getElementById('STUPNO').value.trim();
             if (!StuPhone.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
-                document.getElementById('StuPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
+                document.getElementById('StuPNOError').innerHTML = 'format: XXX-XXXXXXX or XXX-XXXXXXXX.';
                 isValid = false;
             } else {
                 document.getElementById('StuPNOError').innerHTML = '';
@@ -577,7 +578,7 @@ input[type="submit"]:hover
         document.getElementById('STUPNO').addEventListener('input', function() {
             var StuPNO = this.value.trim();
             if (!StuPNO.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
-                document.getElementById('StuPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
+                document.getElementById('StuPNOError').innerHTML = 'format: XXX-XXXXXXX or XXX-XXXXXXXX.';
             } else {
                 document.getElementById('StuPNOError').innerHTML = '';
             }

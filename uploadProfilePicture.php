@@ -10,6 +10,7 @@ require_once 'dbConnect.php'; // Adjust the path as per your project structure
 // Retrieve clerkID from session or set a default value
 $clerkID = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 $clerkType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
+$studentType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
 
 if ($clerkID !== null) {
     // Check if a file was uploaded
@@ -53,6 +54,10 @@ if ($clerkID !== null) {
                 } else if ($clerkType == 'admin') {
                     echo "<script>alert('Profile picture uploaded successfully.');
                     window.location.href = 'ClerkProfile.php'; </script>";
+                }
+                else if ($clerkType == 'student') {
+                    echo "<script>alert('Profile picture uploaded successfully.');
+                    window.location.href = 'editprofile.php'; </script>";
                 }
             } else {
                 echo "Sorry, there was an error uploading your file.";

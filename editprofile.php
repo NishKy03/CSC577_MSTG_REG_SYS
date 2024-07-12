@@ -15,6 +15,9 @@ if (isset($_SESSION['username'])) {
     
     $sql = "SELECT * FROM STUDENT WHERE STUID = ?";
     $stmt = $dbCon->prepare($sql);
+    if ($stmt === false) {
+        die("Error preparing SQL: " . $dbCon->error);
+    }
     $stmt->bind_param('s', $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -25,21 +28,26 @@ if (isset($_SESSION['username'])) {
         echo "<script>alert('Student data not found.');</script>";
         exit;
     }
+
     $sql = "SELECT STUNAME FROM student WHERE STUID = ?";
     $stmt = $dbCon->prepare($sql);
+    if ($stmt === false) {
+        die("Error preparing SQL: " . $dbCon->error);
+    }
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
     $stmt->bind_result($fullName);
     $stmt->fetch();
 
-// Split the full name to get the first name and convert to uppercase
+    // Split the full name to get the first name and convert to uppercase
     $firstName = strtoupper(strtok($fullName, ' '));
     $stmt->close();
 }
 
 // Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Collect form data
     $STUNAME = $_POST['STUNAME'];
     $STUPNO = $_POST['STUPNO'];
     $STUEMAIL = $_POST['STUEMAIL'];
@@ -49,24 +57,91 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $FATHERNAME = $_POST['FATHERNAME'];
     $MOTHERNAME = $_POST['MOTHERNAME'];
     $SALARY = $_POST['SALARY'];
+    $newProfileImage = $_FILES['STUIMAGE']['name'];
 
-    $sql = "UPDATE STUDENT SET STUNAME = ?, STUPNO = ?, STUEMAIL = ?, STUDOB = ?, STUADDRESS = ?, STUGENDER = ?, FATHERNAME = ?, MOTHERNAME = ?, SALARY = ? WHERE STUID = ?";
-    $stmt = $dbCon->prepare($sql);
-    $stmt->bind_param('ssssssssss', $STUNAME, $STUPNO, $STUEMAIL, $STUDOB, $STUADDRESS, $STUGENDER, $FATHERNAME, $MOTHERNAME, $SALARY, $username);
+    // Image upload handling
+    $target_dir = "image/";
+    $target_file = $target_dir . basename($_FILES["STUIMAGE"]["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    if ($stmt->execute()) {
-        echo "<script>alert('Profile updated successfully');</script>";
-        header("location: studentprofile.php");
-        exit;
-    } else {
-        echo "<script>alert('Error updating profile');</script>";
+    // Check if image file is an actual image or fake image
+    if ($newProfileImage) {
+        $check = getimagesize($_FILES["STUIMAGE"]["tmp_name"]);
+        if ($check !== false) {
+            $uploadOk = 1;
+        } else {
+            echo "File is not an image.";
+            $uploadOk = 0;
+        }
+
+        // Check file size
+        if ($_FILES["STUIMAGE"]["size"] > 500000) {
+            echo "Sorry, your file is too large.";
+            $uploadOk = 0;
+        }
+
+        // Allow certain file formats
+        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $uploadOk = 0;
+        }
+
+        // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+        } else {
+            if (move_uploaded_file($_FILES["STUIMAGE"]["tmp_name"], $target_file)) {
+                echo "The file " . htmlspecialchars(basename($_FILES["STUIMAGE"]["name"])) . " has been uploaded.";
+                // Update the database with the new image path
+                $stmt = $dbCon->prepare("UPDATE STUDENT SET STUIMAGE = ? WHERE STUID = ?");
+                if ($stmt === false) {
+                    die("Error preparing SQL: " . $dbCon->error);
+                }
+                $stmt->bind_param("ss", basename($_FILES["STUIMAGE"]["name"]), $username);
+                if ($stmt->execute()) {
+                    echo "Database updated with new profile image.";
+                } else {
+                    echo "Error updating database: " . $stmt->error;
+                }
+                $stmt->close();
+                // No need to set $STUIMAGE here as it is not used further in the code
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+            }
+        }
     }
 
-    $stmt->close();
+    // Update user data
+    if ($newProfileImage && $uploadOk) {
+        // Update user data including new profile image
+        $updateStmt = $dbCon->prepare("UPDATE STUDENT SET STUNAME = ?, STUPNO = ?, STUEMAIL = ?, STUDOB = ?, STUADDRESS = ?, STUGENDER = ?, FATHERNAME = ?, MOTHERNAME = ?, SALARY = ?, STUIMAGE = ? WHERE STUID = ?");
+        if ($updateStmt === false) {
+            die("Prepare failed: " . $dbCon->error);
+        }
+        $updateStmt->bind_param('sssssssssss', $STUNAME, $STUPNO, $STUEMAIL, $STUDOB, $STUADDRESS, $STUGENDER, $FATHERNAME, $MOTHERNAME, $SALARY, basename($_FILES["STUIMAGE"]["name"]), $username);
+    } else {
+        // Update user data without changing profile image
+        $updateStmt = $dbCon->prepare("UPDATE STUDENT SET STUNAME = ?, STUPNO = ?, STUEMAIL = ?, STUDOB = ?, STUADDRESS = ?, STUGENDER = ?, FATHERNAME = ?, MOTHERNAME = ?, SALARY = ? WHERE STUID = ?");
+        if ($updateStmt === false) {
+            die("Prepare failed: " . $dbCon->error);
+        }
+        $updateStmt->bind_param('ssssssssss', $STUNAME, $STUPNO, $STUEMAIL, $STUDOB, $STUADDRESS, $STUGENDER, $FATHERNAME, $MOTHERNAME, $SALARY, $username);
+    }
+
+    if (!$updateStmt->execute()) {
+        die("Execute failed: " . $updateStmt->error);
+    }
+
+    $updateStmt->close();
+    header("Location: studentprofile.php");
+    exit;
 }
 
 $dbCon->close();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,8 +164,8 @@ $dbCon->close();
 	display: flex;
 	align-items: center;
 	padding: 28px 30px;
-	background: #E2E0E0;
-	color: #black;
+	background: #634711;
+	color: #fff;
 }
 .welcome-name {
 	font-size: 25px;
@@ -99,7 +174,7 @@ $dbCon->close();
 .header i {
 	font-size: 30px;
 	cursor: pointer;
-	color: #black;
+	color: #fff;
 }
 .header a{
     text-decoration: none;
@@ -131,7 +206,7 @@ $dbCon->close();
 }
 .side-bar {
     width: 350px;
-    background: #A6A6A6;
+    background: #AFAA79;
     min-height: 100vh;
     transition: 500ms width;
 }
@@ -271,7 +346,7 @@ form  th{
     padding-bottom: 5px;
     font-size: 18px;
 }
-form td input[type="text"], form tr td input[type="date"] {
+form td input[type="text"], form tr td input[type="date"]  {
     padding: 7px;
     width: 90%;
     margin-left: 10px;
@@ -280,6 +355,11 @@ form td input[type="text"], form tr td input[type="date"] {
     outline: none;
     font-size: 17px;
     cursor: pointer;
+}
+form tr td input[type="file"]
+{
+    padding-left: 7px;
+    border-radius: 5px;
 }
 form td input[type="radio"] {
     margin-left: 10px;
@@ -353,7 +433,7 @@ input[type="submit"]:hover {
             <div class="profile-wrapper">
                 <h2>PERSONAL INFORMATION</h2>
                 <div class="rectangle"></div>
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
                     <table >
                         <tr>
                             <th>Full Name</th>
@@ -378,8 +458,8 @@ input[type="submit"]:hover {
                         <tr>
                             <td><input type="text" name="STUADDRESS" id="STUADDRESS" value="<?php echo $studentInfo['STUADDRESS']; ?>" required></td>
                             <td>
-                                <input type="radio" name="STUGENDER" id="STUGENDER_MALE" value="M" <?php echo ($studentInfo['STUGENDER'] == 'Male') ? 'checked' : ''; ?>> <label for="STUGENDER_MALE">Male</label>
-                                <input type="radio" name="STUGENDER" id="STUGENDER_FEMALE" value="F" <?php echo ($studentInfo['STUGENDER'] == 'Female') ? 'checked' : ''; ?>> <label for="STUGENDER_FEMALE">Female</label>
+                                <input type="radio" name="STUGENDER" id="STUGENDER_MALE" value="Male"><label for="STUGENDER_MALE">Male</label>
+                                <input type="radio" name="STUGENDER" id="STUGENDER_FEMALE" value="Female"> <label for="STUGENDER_FEMALE">Female</label>
                             </td>
                         </tr>
                         <tr>
@@ -399,11 +479,11 @@ input[type="submit"]:hover {
                         </tr>
                         <tr>
                             <th>Salary (RM)</th>
-                            <th></th>
+                            <th>Profile Image</th>
                         </tr>
                         <tr>
                             <td><input type="text" name="SALARY" id="SALARY" value="<?php echo $studentInfo['SALARY']; ?>" required></td>
-                            <td></td>
+                            <td><input type="file" name="STUIMAGE" id="STUIMAGE" accept="image/*"></td>
                         </tr>
                     </table>
                     <input type="submit" value="Update">
