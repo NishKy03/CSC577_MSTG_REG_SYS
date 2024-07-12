@@ -10,9 +10,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userType = $_POST["userType"];
 
     if ($userType == "student") {
+        $_SESSION['userType'] = $userType;
         $sql = "SELECT STUID, STUPASSWORD FROM STUDENT WHERE STUID = ?";
         if ($stmt = mysqli_prepare($dbCon, $sql)) {
-            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_bind_param($stmt, "i", $username);
             if (mysqli_stmt_execute($stmt)) {
                 $result = mysqli_stmt_get_result($stmt);
                 if ($result && mysqli_num_rows($result) > 0) {
@@ -37,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else if ($userType == "clerk") {
         $sql = "SELECT CLERKID, CLERKPASSWORD, CLERKTYPE FROM CLERK WHERE CLERKID = ?";
         if ($stmt = mysqli_prepare($dbCon, $sql)) {
-            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_bind_param($stmt, "i", $username);
             if (mysqli_stmt_execute($stmt)) {
                 $result = mysqli_stmt_get_result($stmt);
                 if ($result && mysqli_num_rows($result) > 0) {
@@ -46,9 +47,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $_SESSION['loggedin'] = true;
                         $_SESSION['username'] = $row['CLERKID'];
                         if ($row['CLERKTYPE'] == 'admin') {
+                            $_SESSION['userType'] = $row['CLERKTYPE'];
                             header("location: ADMIN/AdminDashboard.php");
                         } else {
-                            header("location: CLERK/ClerkDashboard.php");
+                            $_SESSION['userType'] = $row['CLERKTYPE'];
+                            header("location: ClerkDashboard.php");
                         }
                         exit();
                     } else {
@@ -66,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else if ($userType == "principal") {
         $sql = "SELECT PRINCIPALID, PRINCIPALPASS FROM PRINCIPAL WHERE PRINCIPALID = ?";
         if ($stmt = mysqli_prepare($dbCon, $sql)) {
-            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_bind_param($stmt, "i", $username);
             if (mysqli_stmt_execute($stmt)) {
                 $result = mysqli_stmt_get_result($stmt);
                 if ($result && mysqli_num_rows($result) > 0) {
