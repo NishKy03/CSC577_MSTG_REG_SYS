@@ -414,8 +414,8 @@ body.dark .home .text{
                 <img src="../ClerkImage/chibi.jpg" alt="">
             </span>
             <div class="text logo-text">
-                <span class="name">Assalamualaikum!</span>
-                <span class="profession">Haji Nik</span>
+                <span class="name">Welcome!</span>
+                <span class="profession">Principal</span>
             </div>
             <i class='bx bx-chevron-right toggle'></i>
         </header>
