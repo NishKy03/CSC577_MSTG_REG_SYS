@@ -40,7 +40,6 @@ if (isset($_SESSION['username'])) {
 
 $dbCon->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,6 +51,7 @@ $dbCon->close();
     <title>User Dashboard</title>
 </head>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 * {
 	padding: 0;
 	margin: 0;
@@ -62,8 +62,8 @@ $dbCon->close();
 	display: flex;
 	align-items: center;
 	padding: 28px 30px;
-	background: #E2E0E0;
-	color: #black;
+	background: #634711;
+	color: #fff;
 }
 .welcome-name {
 	font-size: 25px;
@@ -72,7 +72,7 @@ $dbCon->close();
 .header i {
 	font-size: 30px;
 	cursor: pointer;
-	color: #black;
+	color: #fff;
 }
 .header a{
     text-decoration: none;
@@ -104,7 +104,7 @@ $dbCon->close();
 }
 .side-bar {
     width: 350px;
-    background: #A6A6A6;
+    background: #AFAA79;
     min-height: 100vh;
     transition: 500ms width;
 }
@@ -212,16 +212,22 @@ $dbCon->close();
     margin-left: 20px;
     margin-right: 15px; /* Space between the icon and text */
 }
-.profile-wrapper{
+.profile-wrapper {
     width: 700px;
     height: auto;
-    background: #9e9696d4;
-    margin-top: 100px;
+    background: #fff;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adding a subtle shadow */
+    border-radius: 10px; /* Optional: Adding rounded corners for a softer look */
+    padding: 10px; /* Optional: Adding padding inside the box */
 }
+
 .profile-wrapper h2{
     text-align: center;
     font-size: 25px;
     padding: 15px;
+    font-family: "Poppins", sans-serif;
+    letter-spacing: 0.02em;
 }
 .profile-wrapper p{
     padding: 10px;
@@ -234,18 +240,46 @@ $dbCon->close();
     margin-top: 10px;
     margin-bottom: 10px;
 }
-.link a{
-    padding: 10px 30px;
+.link a {
+    padding: 10px 20px;
     background: #F5C826;
     border: none;
     border-radius: 10px;
-    color:white;
-    font-family:"arial";
+    color: white;
+    font-family: "arial";
     font-size: 17px;
     text-decoration: none;
     font-weight: bold;
-    display: flex;
+    transition: background 0.3s, color 0.3s; /* Add transition for smooth hover effect */
+    position: absolute;
+    top: 300px;
+    left: 71%;
+
+}
+
+.link a:hover {
+    background: #e0b71c; /* Change background color on hover */
+    color: #fff200; /* Change text color on hover */
+}
+
+.image-wrap {
+    border: 1px solid #ccc;
     margin-top: 40px;
+    border-radius: 20px;
+    position: relative; 
+    overflow: hidden;
+    border-radius: 30px; 
+    box-shadow: 0 0 20px 5px rgba(139, 69, 19, 0.8); 
+}
+
+.image-wrap img {
+    width: 150px;
+    height: 150px;
+    border-radius: 20px; /* Match border-radius of the wrap */
+    display: block; /* Remove any default inline spacing */
+}
+.link i{
+    margin-right: 5px;
 }
 </style>
 <body>
@@ -294,27 +328,30 @@ $dbCon->close();
             <div class="circled-menu-parent">
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
             </div>
+            <div class="image-wrap">
+                <img src="<?php echo !empty($studentInfo['STUIMAGE']) ? 'image/' . htmlspecialchars($studentInfo['STUIMAGE']) : 'default-profile.png'; ?>" alt="Profile Picture">
+            </div>
             <div class="profile-wrapper">
                 <h2>PERSONAL INFORMATION</h2>
                 <hr>
                 <div class="personal-class">
-                <p><b>Full Name: </b> <?php echo $studentInfo['STUNAME']; ?></p>
-                    <p><b>Phone Number: </b> <?php echo $studentInfo['STUPNO']; ?></p>
-                    <p><b>Email: </b> <?php echo $studentInfo['STUEMAIL']; ?></p>
-                    <p><b>Date of Birth: </b> <?php echo $studentInfo['STUDOB']; ?></p>
-                    <p><b>Address : </b><?php echo $studentInfo['STUADDRESS']; ?></p>
+                <p><b>Full Name : </b> <span style="color: grey;"><?php echo $studentInfo['STUNAME']; ?></span></p>
+                    <p><b>Phone Number : </b> <span style="color: grey;"><?php echo $studentInfo['STUPNO']; ?></span></p>
+                    <p><b>Email : </b> <span style="color: grey;"><?php echo $studentInfo['STUEMAIL']; ?></span></p>
+                    <p><b>Date of Birth : </b> <span style="color: grey;"><?php echo $studentInfo['STUDOB']; ?></span></p>
+                    <p><b>Address : </b><span style="color: grey;"><?php echo $studentInfo['STUADDRESS']; ?></span></p>
                 </div>
                 <hr>
                 <h2>PARENTS INFORMATION</h2>
                 <hr>
                 <div class="parents-class">
-                    <p><b>Father's Name : </b><?php echo $studentInfo['FATHERNAME']; ?></p>
-                    <p><b>Mother's Name : </b><?php echo $studentInfo['MOTHERNAME']; ?></p>
-                    <p><b>Salary : </b>RM <?php echo number_format($studentInfo['SALARY'], 2); ?></p>
+                    <p><b>Father's Name : </b><span style="color: grey;"><?php echo $studentInfo['FATHERNAME']; ?></span></p>
+                    <p><b>Mother's Name : </b><span style="color: grey;"><?php echo $studentInfo['MOTHERNAME']; ?></span></p>
+                    <p><b>Salary : </b> <span style="color: grey;">RM <?php echo number_format(!empty($studentInfo['SALARY']) ? $studentInfo['SALARY'] : 0.0, 2); ?></span></p>
                 </div>
             </div>
             <div class="link">
-                <a href="editprofile.php">Edit</a>
+                <a href="editprofile.php"><i class="fa fa-pencil"></i> Edit</a>
             </div>
         </section>
     </div>

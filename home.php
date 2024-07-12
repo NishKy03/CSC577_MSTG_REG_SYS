@@ -63,8 +63,8 @@ $dbCon->close();
 	display: flex;
 	align-items: center;
 	padding: 28px 30px;
-	background: #E2E0E0;
-	color: #black;
+	background: #634711;
+	color: #fff;
 }
 .welcome-name {
 	font-size: 25px;
@@ -73,7 +73,7 @@ $dbCon->close();
 .header i {
 	font-size: 30px;
 	cursor: pointer;
-	color: #black;
+	color: #fff;
 }
 .header a{
     text-decoration: none;
@@ -105,7 +105,7 @@ $dbCon->close();
 }
 .side-bar {
     width: 350px;
-    background: #A6A6A6;
+    background: #AFAA79;
     min-height: 100vh;
     transition: 500ms width;
 }
