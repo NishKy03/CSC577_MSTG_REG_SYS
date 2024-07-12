@@ -266,8 +266,6 @@ table tr td{
             width: 150px; /* Adjust size as needed */
             height: 150px;
             border-radius: 1rem;
-            margin-top: -20px;
-            margin-bottom: 10px;
             object-fit: cover;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
