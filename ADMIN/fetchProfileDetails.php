@@ -75,6 +75,44 @@ $dbCon->close();
         .profile-container .icon-container a:hover {
             color: #007bff;
         }
+        .edit-container {
+            display: none;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            text-align: center;
+            margin-left: 25px;
+        }
+        .edit-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .edit-container form label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .edit-container form input {
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .edit-container form button {
+            padding: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .edit-container form button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -96,6 +134,32 @@ $dbCon->close();
             <p>No profile details found for this clerk.</p>
         <?php endif; ?>
     </div>
-    
+    <div class="edit-container">
+        <h2>Edit Clerk</h2>
+        <form method="post" action="">
+            <label for="clerkname">Name</label>
+            <input type="text" id="clerkname" name="clerkname" value="<?php echo htmlspecialchars($clerk['CLERKNAME']); ?>" required>
+            
+            <label for="clerkemail">Email</label>
+            <input type="email" id="clerkemail" name="clerkemail" value="<?php echo htmlspecialchars($clerk['CLERKEMAIL']); ?>" required>
+            
+            <label for="clerkpno">Phone</label>
+            <input type="text" id="clerkpno" name="clerkpno" value="<?php echo htmlspecialchars($clerk['CLERKPNO']); ?>" required>
+            
+            <label for="clerkdob">Date of Birth</label>
+            <input type="date" id="clerkdob" name="clerkdob" value="<?php echo htmlspecialchars($clerk['CLERKDOB']); ?>" required>
+            
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+    <script>
+        function showEditForm() {
+            document.querySelector('.profile-container').style.display = 'none';
+            document.querySelector('.edit-container').style.display = 'block';
+        }
+        function printProfile() {
+            window.print();
+        }
+    </script>
 </body>
 </html>
