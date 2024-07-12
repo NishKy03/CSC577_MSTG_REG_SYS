@@ -500,7 +500,6 @@ $dbCon->close();
             <div id="profile-details"></div>
         </div>
     </div>
-
     <script>
         // Get the modal
         var modal = document.getElementById("myModal");
@@ -539,5 +538,6 @@ $dbCon->close();
             };
         }
     </script>
+
 </body>
 </html>
