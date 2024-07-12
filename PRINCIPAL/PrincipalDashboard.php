@@ -4,7 +4,7 @@ require_once("../dbConnect.php");
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("location: welcome.php"); // Redirect to login page if not logged in
+    header("location: ../welcome.php"); // Redirect to login page if not logged in
     exit;
 }
 
@@ -463,7 +463,7 @@ body.dark .home .text{
                         </a>
                     </li>
                     <li class="">
-                        <a href="logout.php">
+                        <a href="../logout.php">
                             <i class='bx bx-log-out icon' ></i>
                             <span class="text nav-text">Logout</span>
                         </a>
