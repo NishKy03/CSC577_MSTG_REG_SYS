@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if ($password == $row['STUPASSWORD']) {
                         $_SESSION['loggedin'] = true;
                         $_SESSION['username'] = $row['STUID'];
-                        header("location: STUDENT/home.php");
+                        header("location: home.php");
                         exit();
                     } else {
                         echo "<script>alert('Invalid username or password. Please try again.');</script>";
