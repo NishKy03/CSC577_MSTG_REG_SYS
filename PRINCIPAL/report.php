@@ -1,3 +1,39 @@
+<?php
+require_once("../dbConnect.php");
+
+
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("location: welcome.php"); // Redirect to login page if not logged in
+    exit;
+}
+
+// Prepare and execute the SQL statement to get student data
+$stmtStudent = $dbCon->prepare("SELECT stuid, stuname, studob, stugender, stuaddress FROM student");
+$stmtStudent->execute();
+$stmtStudent->store_result();
+$stmtStudent->bind_result($studentId, $studentName, $studentDob, $studentGender, $studentAddress);
+
+// Prepare and execute the SQL statement to get clerk data
+$stmtClerk = $dbCon->prepare("SELECT clerkid, clerkname, clerktype, clerkemail FROM clerk");
+$stmtClerk->execute();
+$stmtClerk->store_result();
+$stmtClerk->bind_result($clerkid, $clerkname, $department, $contact);
+
+function calculateAge($dob) {
+    $dob = new DateTime($dob);
+    $now = new DateTime();
+    $age = $now->diff($dob);
+    return $age->y; }  
+
+
+
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -364,14 +400,14 @@ tbody tr:nth-child(odd) {
 <body>
     <nav class="sidebar close">
         <header>
-            <span class="image">
-                <img src="../ClerkImage/chibi.jpg" alt="">
-            </span>
-            <div class="text logo-text">
-                <span class="name">Assalamualaikum!</span>
-                <span class="profession">Haji Nik</span>
-            </div>
-            <i class='bx bx-chevron-right toggle'></i>
+        <span class="image">
+            <img src="../ClerkImage/chibi.jpg" alt="">
+        </span>
+        <div class="text logo-text">
+            <span class="name">Welcome!</span>
+            <span class="profession"> Principal </span>
+        </div>
+        <i class='bx bx-chevron-right toggle'></i>
         </header>
 
         <div class="menu-bar">
@@ -405,33 +441,38 @@ tbody tr:nth-child(odd) {
     <section class="home">
         <div class="dashboard-wrapper">Report</div>
         <div class="table-wrapper">
-        <h2>Student List</h2>
+            <h2>Student List</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>No.</th>
+                        <th>Matric No.</th>
                         <th>Name</th>
                         <th>Age</th>
-                        <th>Class</th>
+                        <th>Gender</th>
+                        <th>Address</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>John Doe</td>
-                        <td>16</td>
-                        <td>10-A</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Jane Smith</td>
-                        <td>15</td>
-                        <td>9-B</td>
-                    </tr>
-                    <!-- Add more rows as needed -->
+                    <?php
+                    if ($stmtStudent->num_rows > 0) {
+                        // Output data of each row for students
+                        while ($stmtStudent->fetch()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($studentId) . "</td>";
+                            echo "<td>" . htmlspecialchars($studentName) . "</td>";
+                            echo "<td>" . (isset($studentDob) ? calculateAge($studentDob) : 'Unknown') . "</td>";
+                            echo "<td>" . htmlspecialchars($studentGender) . "</td>";
+                            echo "<td>" . htmlspecialchars($studentAddress) . "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='5'>No students found</td></tr>";
+                    }
+                    $stmtStudent->close();
+                    ?>
                 </tbody>
             </table>
-            
+
             <h2>Clerk List</h2>
             <table>
                 <thead>
@@ -443,23 +484,25 @@ tbody tr:nth-child(odd) {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Ali Ahmad</td>
-                        <td>Admin</td>
-                        <td>ali@example.com</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Fatimah Yusof</td>
-                        <td>Finance</td>
-                        <td>fatimah@example.com</td>
-                    </tr>
-                    <!-- Add more rows as needed -->
+                    <?php
+                    if ($stmtClerk->num_rows > 0) {
+                        // Output data of each row for clerks
+                        while ($stmtClerk->fetch()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($clerkid) . "</td>";
+                            echo "<td>" . htmlspecialchars($clerkname) . "</td>";
+                            echo "<td>" . htmlspecialchars($department) . "</td>";
+                            echo "<td>" . htmlspecialchars($contact) . "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='4'>No clerks found</td></tr>";
+                    }
+                    $stmtClerk->close();
+                    ?>
                 </tbody>
             </table>
         </div>
-        
     </section>
 
     <script>
@@ -493,3 +536,7 @@ modeSwitch.addEventListener("click" , () =>{
 
 </body>
 </html>
+
+<?php
+$dbCon->close();
+?>
