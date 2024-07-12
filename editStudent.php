@@ -20,11 +20,62 @@ $stmt->fetch();
 $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
-
+$stuID = "";
 $sql = "SELECT * FROM student";
 $result = $dbCon->query($sql);
 
-$dbCon->close();
+if (isset($_GET['id'])) {
+    $stuID = $_GET['id'];
+} else {
+    echo "<script>alert('Error: Student ID not set.');
+    window.location.href = 'editStudent.php?id=" . $_GET['id'] . "'
+    </script>";
+}
+
+$sql1 = "SELECT * FROM student WHERE STUID = ?";
+$stmt1 = $dbCon->prepare($sql1);
+$stmt1->bind_param("i", $stuID);
+if($stmt1->execute()){
+    $result1 = $stmt1->get_result();
+    $row = $result1->fetch_assoc();
+    $STUID = $row['STUID'];
+    $STUNAME = $row['STUNAME'];
+    $STUPNO = $row['STUPNO'];
+    $STUEMAIL = $row['STUEMAIL'];
+    $STUPASSWORD = $row['STUPASSWORD'];
+    $STUGENDER = $row['STUGENDER'];
+    $STUDOB = $row['STUDOB'];
+    $STUADDRESS = $row['STUADDRESS'];
+    $FATHERNAME = $row['FATHERNAME'];
+    $MOTHERNAME = $row['MOTHERNAME'];
+    $SALARY = $row['SALARY'];
+
+    $stmt1->close();
+} else{
+    echo "<script>alert('Error: " . $stmt1->error . "');</script>";
+}
+
+$sql2 = "UPDATE student SET STUNAME = ?, STUPNO = ?, STUEMAIL = ?, STUPASSWORD = ?, STUGENDER = ?, STUDOB = ?, STUADDRESS = ?, FATHERNAME = ?, MOTHERNAME = ?, SALARY = ? WHERE STUID = ?";
+$stmt2 = $dbCon->prepare($sql2);
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $STUNAME = $_POST['STUNAME'];
+    $STUPNO = $_POST['STUPNO'];
+    $STUEMAIL = $_POST['STUEMAIL'];
+    $STUGENDER = $_POST['STUGENDER'];
+    $STUDOB = $_POST['STUDOB'];
+    $STUADDRESS = $_POST['STUADDRESS'];
+    $FATHERNAME = $_POST['FATHERNAME'];
+    $MOTHERNAME = $_POST['MOTHERNAME'];
+    $SALARY = $_POST['SALARY'];
+
+    $stmt2->bind_param("ssssssssssi", $STUNAME, $STUPNO, $STUEMAIL, $STUPASSWORD, $STUGENDER, $STUDOB, $STUADDRESS, $FATHERNAME, $MOTHERNAME, $SALARY, $stuID);
+    if($stmt2->execute()){
+        echo "<script>alert('Student information updated successfully.');
+        window.location.href = 'listofstudent.php';</script>";
+    } else {
+        echo "<script>alert('Error: " . $stmt2->error . "');</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -295,7 +346,7 @@ input[type="submit"]:hover
         </nav>
         <section class="section-1">
             <button class="back-button"><a href="listofstudent.php"><i class="fa fa-arrow-left" aria-hidden="true"></i></a></button>
-                <form action="" class="form-wrapper">
+                <form action="editStudent.php?id=<?= htmlspecialchars($_GET['id'])?>" method="POST" class="form-wrapper">
                     <table class="personal-class">
                         <tr>
                             <th colspan="2">
@@ -305,34 +356,35 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUNAME" required>
+                                <input type="text" name="STUNAME" value="<?= isset($STUNAME) ? $STUNAME : ''; ?>" placeholder="Enter Student's Name" required>
                             </td>
                             <td>
                                 <b>Phone Number <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUNAME" required>
+                                <input type="text" name="STUPNO" value="<?= isset($STUPNO) ? $STUPNO : ''; ?>" placeholder="Enter Student's Phone Number" required>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Date of Birth <span style="color: red;">*</span></b><br>
-                                <input type="date" name="STUDOB" required>
+                                <input type="date" name="STUDOB" value="<?= isset($STUDOB) ? $STUDOB : ''; ?>" placeholder="Enter Student's Date of Birth" required>
                             </td>
                             <td>
                                 <b>Gender <span style="color: red;">*</span></b><br>
                                 <select name="STUGENDER" id="STUGENDER" required>
-                                    <option value="m">Male</option>
-                                    <option value="f">Female</option>
+                                    <option value="<?= isset($STUGENDER) ? $STUGENDER : ''; ?>" disabled selected><?= isset($STUGENDER) ? $STUGENDER : 'Select Gender'; ?></option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
                                 </select>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Address <span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUADDRESS" required>
+                                <input type="text" name="STUADDRESS" value="<?= isset($STUADDRESS) ? $STUADDRESS : ''; ?>" placeholder="Enter Student's Address" required>
                             </td>
                             <td>
                                 <b>Email<span style="color: red;">*</span></b><br>
-                                <input type="text" name="STUEMAIL" required>
+                                <input type="text" name="STUEMAIL" value="<?= isset($STUEMAIL)? $STUEMAIL: ''; ?>" placeholder="Enter Student's Email" required>
                             </td>
                         </tr>
                     </table>
@@ -345,17 +397,17 @@ input[type="submit"]:hover
                         <tr>
                             <td>
                                 <b>Father Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="FATHERNAME" required>
+                                <input type="text" name="FATHERNAME" value="<?= isset($FATHERNAME) ? $FATHERNAME : ''?>" placeholder="Enter Father's Name" required>
                             </td>
                             <td>
                                 <b>Mother Name <span style="color: red;">*</span></b><br>
-                                <input type="text" name="MOTHERNAME" required>
+                                <input type="text" name="MOTHERNAME" value="<?= isset($MOTHERNAME) ? $MOTHERNAME : ''?>" placeholder="Enter Mother's Name" required>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Salary (RM)<span style="color: red;">*</span></b><br>
-                                <input type="text" name="SALARY" required>
+                                <input type="text" name="SALARY" value="<?= isset($SALARY) ? $SALARY : '' ?>" placeholder="Enter Parents' Salary" required>
                             </td>
                             <td>
                             </td>
@@ -367,4 +419,3 @@ input[type="submit"]:hover
     </div>
 </body>
 </html>
-
