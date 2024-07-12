@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert the new student into the database
-        $sql = "INSERT INTO STUDENT (STUID, STUNAME, STUPNO, STUEMAIL, STUPASSWORD) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO STUDENT (STUID, STUNAME, STUPNO, STUEMAIL, STUPASSWORD, STATUS) VALUES (?, ?, ?, ?, ?, 'Pending')";
         $stmt = $dbCon->prepare($sql);
         $stmt->bind_param('sssss', $newID, $STUNAME, $STUPNO, $STUEMAIL, $STUPASSWORD);
 

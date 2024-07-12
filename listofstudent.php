@@ -23,8 +23,6 @@ $firstName = strtoupper(strtok($fullName, ' '));
 
 $sql = "SELECT * FROM student";
 $result = $dbCon->query($sql);
-
-$dbCon->close();
 ?>
 
 <!DOCTYPE html>

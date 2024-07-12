@@ -10,18 +10,60 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $username = $_SESSION['username'];
 
 // Fetch the student's full name
-$sql = "SELECT CLERKNAME FROM clerk WHERE CLERKID = ?";
+$sql = "SELECT CLERKNAME, CLERKPNO, CLERKDOB, CLERKEMAIL FROM clerk WHERE CLERKID = ?";
 $stmt = $dbCon->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($fullName);
+$stmt->bind_result($fullName, $phoneNo, $dob, $email);
 $stmt->fetch();
 $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
-$dbCon->close();
+$CLERKNAME = $CLERKPHONENO = $CLERKEMAIL = $CLERKDOB = "";
+$CLERKNAME_err = $CLERKPHONENO_err = $CLERKEMAIL_err = $CLERKDOB_err = "";
+
+if($_SERVER["REQUEST_METHOD"]== "POST"){
+
+    if(empty(trim($_POST["CLERKNAME"]))){
+        $CLERKNAME_err = "Please enter your name.";
+    } else{
+        $CLERKNAME = trim($_POST["CLERKNAME"]);
+        if(!preg_match("/^[a-zA-Z-' ]*$/", $CLERKNAME)){
+            $CLERKNAME_err = "Only letters and white space allowed.";
+        }
+    }
+    if(empty(trim($_POST['CLERKPHONENO']))){
+        $CLERKPHONENO_err = "Please enter your phone number.";
+    } else{
+        $CLERKPHONENO = trim($_POST['CLERKPHONENO']);
+        if(!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $STUPNO)){
+            $CLERKPHONENO_err = "Phone Number must be in format 'XXX-XXXXXXXX' or 'XXX-XXXXXXX'";
+        }
+    }
+    if(empty(trim($_POST['CLERKEMAIL']))){
+        $CLERKEMAIL_err = "Please enter your email.";
+    } else{
+        $CLERKEMAIL = trim($_POST['CLERKEMAIL']);
+        if(!filter_var($STUEMAIL, FILTER_VALIDATE_EMAIL)){
+            $CLERKEMAIL_err = "Invalid email format.";
+        }
+    }
+
+    $CLERKDOB = $_POST['CLERKDOB'];
+    
+
+    $sql1 = "UPDATE clerk SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ? WHERE CLERKID = ?";
+    $stmt1 = $dbCon->prepare($sql1);
+    $stmt1->bind_param("sssss", $CLERKNAME, $CLERKPHONENO, $CLERKEMAIL, $CLERKDOB, $username);
+    if($stmt1->execute()){
+        echo "<script>alert('Profile updated successfully.');
+        window.location.href = 'ClerkProfile.php'</script>";
+    } else {
+        echo "<script>alert('Error updating profile.');</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -276,6 +318,10 @@ table tr td{
     width: auto; /* Adjust width to fit content */
     margin: 10px 5px; /* Optional: Add margin for spacing */
 }
+.error {
+            color: red;
+            font-weight: bold;
+        }
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -328,27 +374,29 @@ table tr td{
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
             </div>
             <div class="profile-wrap">
-                <form action="">
+                <form action="editclerkprofile.php" method="POST">
                     <table>
                         <tr>
                             <td><b>ID : </b></td>
-                            <td>10000</td>
+                            <td><?php echo $_SESSION['username']?></td>
                         </tr>
                         <tr>
                             <td><b>Name : </b></td>
-                            <td><input type="text" name="CLERKNAME"></td>
+                            <td><input type="text" name="CLERKNAME" id="CLERKNAME" value="<?php echo $fullName; ?>"><span id="ClerkNameError" class="error"><?php echo $CLERKNAME_err?></span></td>
+                            
                         </tr>
                         <tr>
                             <td><b>Phone Number : </b></td>
-                            <td><input type="text" name="CLERKPHONENO"></td>
+                            <td><input type="text" name="CLERKPHONENO" id="CLERKPHONENO" value="<?php echo $phoneNo; ?>"><span id="ClerkPNOError" class="error"><?php echo $CLERKPHONENO_err?></span></td>
+                            
                         </tr>
                         <tr>
                             <td><b>Email :</b></td>
-                            <td><input type="text" name="CLERKEMAIL"></td>
+                            <td><input type="text" name="CLERKEMAIL" id="CLERKEMAIL" value="<?php echo $email; ?>"><span id="ClerkEmailError" class="error"><?php echo $CLERKEMAIL_err?></span></td>
                         </tr>
                         <tr>
                             <td><b>Date of Birth :</b></td>
-                            <td><input type="date" name="CLERKDOB"></td>
+                            <td><input type="date" name="CLERKDOB" value="<?php echo $dob; ?>"></td>
                         </tr>
                         <tr>
                             <td><b>Profile Image :</b></td>
@@ -365,5 +413,69 @@ table tr td{
             </div>
         </section>
     </div>
+    <script>
+        // Function to validate form fields on submit
+        function validateForm() {
+            var isValid = true;
+
+            // Validate Student's Name
+            var ClerkName = document.getElementById('CLERKNAME').value.trim();
+            if (!ClerkName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('ClerkNameError').innerHTML = 'Please enter a valid name (only letters and spaces, max 50 characters).';
+                isValid = false;
+            } else {
+                document.getElementById('ClerkNameError').innerHTML = '';
+            }
+
+            // Validate Student's Phone Number
+            var ClerkPhone = document.getElementById('CLERKPHONENO').value.trim();
+            if (!ClerkPhone.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
+                document.getElementById('ClerkPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
+                isValid = false;
+            } else {
+                document.getElementById('ClerkPNOError').innerHTML = '';
+            }
+
+            // Validate Student's Email
+            var ClerkEmail = document.getElementById('CLERKEMAIL').value.trim();
+            if (!ClerkEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('ClerkEmailError').innerHTML = 'Invalid Email.';
+                isValid = false;
+            } else {
+                document.getElementById('ClerkEmailError').innerHTML = '';
+            }
+
+            return isValid;
+        }
+
+        // Real-time validation on input change
+        document.getElementById('CLERKNAME').addEventListener('input', function() {
+            var ClerkName = this.value.trim();
+            if (!ClerkName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('ClerkNameError').innerHTML = 'Please enter a valid name (only letters and spaces).';
+            } else {
+                document.getElementById('ClerkNameError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('CLERKPHONENO').addEventListener('input', function() {
+            var ClerkPNO = this.value.trim();
+            if (!ClerkPNO.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
+                document.getElementById('ClerkPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
+            } else {
+                document.getElementById('ClerkPNOError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('CLERKEMAIL').addEventListener('input', function() {
+            var ClerkEmail = this.value.trim();
+            if (!ClerkEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('ClerkEmailError').innerHTML = 'Invalid Email.';
+            } else {
+                document.getElementById('ClerkEmailError').innerHTML = '';
+            }
+        });
+
+    </script>   
 </body>
 </html>

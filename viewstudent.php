@@ -21,10 +21,28 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
-$sql = "SELECT * FROM student";
-$result = $dbCon->query($sql);
+if(isset($_GET['id'])){
+    $STUID = $_GET['id'];
+    $sql = "SELECT * FROM student WHERE STUID = '$STUID'";
+    $result = $dbCon->query($sql);
+    $row = $result->fetch_assoc();
+    $STUID = $row['STUID'];
+    $STUNAME = $row['STUNAME'];
+    $STUEMAIL = $row['STUEMAIL'];
+    $STUPNO = $row['STUPNO'];
+    $STUDOB = $row['STUDOB'];
+    $STUGENDER = $row['STUGENDER'];
+    $FATHERNAME = $row['FATHERNAME'];
+    $MOTHERNAME = $row['MOTHERNAME'];
+    $SALARY = $row['SALARY'];
+    $STUDENTIMAGE = $row['STUIMAGE'];
+
+} else{
+    echo "<script>alert('No student ID is set.');</script>";
+}
 
 $dbCon->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -292,42 +310,42 @@ $dbCon->close();
                     </tr>
                     <tr>
                         <td><b>Student ID</b></td>
-                        <td>102</td>
+                        <td><?= isset($STUID) ? $STUID : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Name</b></td>
-                        <td>Danish Haikal Bin Suhaimi</td>
+                        <td><?= isset($STUNAME) ? $STUNAME : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Email</b></td>
-                        <td>danish151003@gmail.com</td>
+                        <td><?= isset($STUEMAIL) ? $STUEMAIL : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Date of Birth</b></td>
-                        <td>15-10-2003</td>
+                        <td><?= isset($STUDOB) ? $STUDOB : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Phone Number</b></td>
-                        <td>011-26269760</td>
+                        <td><?= isset($STUPNO) ? $STUPNO : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Gender</b></td>
-                        <td>Male</td>
+                        <td><?= isset($STUGENDER) ? $STUGENDER : 'NULL'?></td>
                     </tr>
                     <tr>
                         <th colspan="2">PARENT 'S INFORMATION</th>
                     </tr>
                     <tr>
                         <td><b>Father Name</b></td>
-                        <td>Suhaimi Bin Saad</td>
+                        <td><?= isset($FATHERNAME) ? $FATHERNAME : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Mother Name</b></td>
-                        <td>Nurliza Bin Abdullah</td>
+                        <td><?= isset($MOTHERNAME) ? $MOTHERNAME : 'NULL'?></td>
                     </tr>
                     <tr>
                         <td><b>Salary</b></td>
-                        <td>RM10,000</td>
+                        <td><?= isset($SALARY) ? "RM ".$SALARY : 'NULL'?></td>
                     </tr>
                 </table>
             </div>
