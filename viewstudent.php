@@ -302,7 +302,7 @@ $dbCon->close();
             <div class="profile-wrap">
                 <button class="back-button"><a href="listofstudent.php"><i class="fa fa-arrow-left" aria-hidden="true"></i></a></button>
                 <div class="image-frame">
-                    <img src="danishpic.png" alt="Student Image">
+                <img src="<?php echo !empty($STUDENTIMAGE) ? 'image/' . htmlspecialchars($STUDENTIMAGE) : 'default-profile.png'; ?>" alt="Profile Picture">
                 </div>
                 <table class="table-class">
                     <tr>
