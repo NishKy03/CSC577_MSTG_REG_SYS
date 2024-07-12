@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if ($password == $row['PRINCIPALPASS']) {
                         $_SESSION['loggedin'] = true;
                         $_SESSION['username'] = $row['PRINCIPALID'];
-                        header("location: PrincipalDashboard.php");
+                        header("location: PRINCIPAL/PrincipalDashboard.php");
                         exit();
                     } else {
                         echo "<script>alert('Invalid username or password. Please try again.');</script>";
