@@ -1,3 +1,29 @@
+<?php
+require_once("../dbConnect.php");
+
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("location: welcome.php"); // Redirect to login page if not logged in
+    exit;
+}
+
+// Query to get total count of clerks
+$stmtClerkCount = $dbCon->prepare("SELECT COUNT(*) AS total_clerks FROM clerk");
+$stmtClerkCount->execute();
+$stmtClerkCount->bind_result($totalClerks);
+$stmtClerkCount->fetch();
+$stmtClerkCount->close();
+
+// Query to get total count of students
+$stmtStudentCount = $dbCon->prepare("SELECT COUNT(*) AS total_students FROM student");
+$stmtStudentCount->execute();
+$stmtStudentCount->bind_result($totalStudents);
+$stmtStudentCount->fetch();
+$stmtStudentCount->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -456,14 +482,14 @@ body.dark .home .text{
                 <div class="icon-class1">
                     <span><i class="fa fa-users" aria-hidden="true"></i></span>
                 </div>
-                <p><b>20</b></p>
+                <p><b><?php echo $totalClerks; ?></b></p>
             </div>
             <div class="show-box2">
                 <h3>Total Student</h3>
                 <div class="icon-class2">
                     <span><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
                 </div>
-                <p><b>100</b></p>
+                <p><b><?php echo $totalStudents; ?></b></p>
             </div>
             <div class="show-box2">
                 <h3>Total Approved</h3>
