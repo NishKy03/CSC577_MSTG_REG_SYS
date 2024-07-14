@@ -120,6 +120,25 @@
                 text-align: end;
                 font-size: 8px;
             }
+            .print-button {
+                display: block;
+                width: 100px;
+                margin: 20px auto;
+                padding: 10px;
+                background-color: #4CAF50;
+                color: white;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 5px;
+            }
+            .print-button:hover {
+                background-color: #8de267;
+            }
+            @media print {
+                .print-button {
+                    display: none;
+                }
+            }
         </style>
     </head>
     <body>
@@ -185,6 +204,7 @@
             </tr>
             <tr></tr>
         </table>
+        <a href="printStudentReport.php?id=<?php echo $stuID; ?>"  class="print-button">Print</a>
     </div>
     </div>
     </body>

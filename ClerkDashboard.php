@@ -21,6 +21,23 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
+$totalStudents = 0;
+$totalClerks = 0;
+
+$sql = "SELECT COUNT(*) AS count FROM student";
+$result = $dbCon->query($sql);
+if ($result) {
+    $row = $result->fetch_assoc();
+    $totalStudents = $row['count'];
+}
+
+$sql = "SELECT COUNT(*) AS count FROM clerk";
+$result = $dbCon->query($sql);
+if ($result) {
+    $row = $result->fetch_assoc();
+    $totalClerks = $row['count'];
+}
+
 $dbCon->close();
 ?>
 
@@ -334,7 +351,75 @@ $dbCon->close();
                 </li>
             </ul>
         </nav>
-        
+        <section class="section-1">
+            <div class="circled-menu-parent">
+                <p><i class="fa fa-th-large" style="font-size:25px;"></i>Dashboard</p>
+            </div>
+            <div class="slider">
+                <div class="images">
+                    <input type="radio" name="slide" id="img1" checked>
+                    <input type="radio" name="slide" id="img2">
+                    <input type="radio" name="slide" id="img3">
+                    <input type="radio" name="slide" id="img4">
+
+                    <img src="STUDENT/maahad1.jpg" class="m1" alt="img1">
+                    <img src="STUDENT/maahad2.jpg" class="m2" alt="img2">
+                    <img src="STUDENT/maahad3.jpg" class="m3" alt="img3">
+                    <img src="STUDENT/maahad4.jpg" class="m4" alt="img4">
+                </div>
+                <div class="dots">
+                    <label for="img1"></label>
+                    <label for="img2"></label>
+                    <label for="img3"></label>
+                    <label for="img4"></label>
+                </div>
+            </div>
+
+            <div class="latest-infographic">
+                <p>Latest Infographic</p>
+            </div>
+
+            <div class="infodisplay">
+                <div class="graduation-cap-parent">
+                    <span style="font-size: 60px;"><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
+                    <p>
+                        <span id="totalStudents" class="count-up"><?php echo $totalStudents; ?></span><br>Students
+                    </p>
+                </div>
+                <div class="management-parent">
+                    <span style="font-size: 50px;"><i class="fa fa-users" aria-hidden="true"></i></span>
+                    <p>
+                        <span id="totalClerks" class="count-up"><?php echo $totalClerks; ?></span><br>Clerks
+                    </p>
+                </div>
+            </div>
+            
+            <script>
+                function animateValue(id, start, end, duration) {
+                    var range = end - start;
+                    var current = start;
+                    var increment = end > start ? 1 : -1;
+                    var stepTime = Math.abs(Math.floor(duration / range));
+                    var obj = document.getElementById(id);
+                    var timer = setInterval(function() {
+                        current += increment;
+                        obj.innerHTML = current;
+                        if (current == end) {
+                            clearInterval(timer);
+                        }
+                    }, stepTime);
+                }
+
+                // Call the animation function after page load
+                window.onload = function() {
+                    var totalStudents = parseInt("<?php echo $totalStudents; ?>", 10);
+                    var totalClerks = parseInt("<?php echo $totalClerks; ?>", 10);
+
+                    animateValue("totalStudents", 0, totalStudents, 2000);
+                    animateValue("totalClerks", 0, totalClerks, 2000);
+                };
+            </script>
+        </section>
     </div>
 </body>
 </html>

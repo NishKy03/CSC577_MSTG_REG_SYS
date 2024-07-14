@@ -11,7 +11,7 @@ require_once 'dbConnect.php'; // Adjust the path as per your project structure
 $userID = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 $userType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
 
-if ($clerkID !== null) {
+if ($userID !== null) {
     // Check if a file was uploaded
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
         // Process file upload
@@ -37,7 +37,7 @@ if ($clerkID !== null) {
             // Redirect to profile page or display success message
             if ($userType == 'clerk') {
                         // File destination path
-                $uploadPath = 'clerks/image/profile/' . $newFileName;
+                $uploadPath = 'CLERK' . $newFileName;
 
                     // Move uploaded file to destination
                 if (move_uploaded_file($fileTempName, $uploadPath)) {
@@ -54,7 +54,7 @@ if ($clerkID !== null) {
                 }
             } else if ($userType == 'admin') {
                 // File destination path
-                $uploadPath = 'admins/image/profile/' . $newFileName;
+                $uploadPath = 'ADMIN' . $newFileName;
 
                 // Move uploaded file to destination
                 if (move_uploaded_file($fileTempName, $uploadPath)) {
@@ -72,7 +72,7 @@ if ($clerkID !== null) {
             }
             else if ($userType == 'student') {
                 // File destination path
-                $uploadPath = 'students/image/profile/' . $newFileName;
+                $uploadPath = 'STUDENT' . $newFileName;
 
                 // Move uploaded file to destination
                 if (move_uploaded_file($fileTempName, $uploadPath)) {

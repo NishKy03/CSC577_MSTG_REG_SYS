@@ -69,6 +69,11 @@ $dbCon->close();
         .print-button:hover {
             background-color: #8de267;
         }
+        @media print {
+            .print-button {
+                display: none;
+            }
+        }
     </style>
     <script>
         window.onload = function() {

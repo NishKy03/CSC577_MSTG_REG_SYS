@@ -23,6 +23,24 @@ $firstName = strtoupper(strtok($fullName, ' '));
 
 $sql = "SELECT * FROM student";
 $result = $dbCon->query($sql);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $studentId = $_POST['id'];
+    $newStatus = $_POST['status'];
+
+    $sql = "UPDATE student SET STATUS = ? WHERE STUID = ?";
+    $stmtUpdate = $dbCon->prepare($sql);
+    $stmtUpdate->bind_param("ss", $newStatus, $studentId);
+
+    if ($stmtUpdate->execute()) {
+        echo 'success';
+    } else {
+        echo 'error';
+    }
+
+    $stmtUpdate->close();
+    exit; // Ensure no further code is executed after updating the status
+}
 ?>
 
 <!DOCTYPE html>
@@ -224,6 +242,13 @@ table tr:nth-child(even) {
 table tr:nth-child(odd) {
     background-color: #BDB8B8; /* Light grey background for even rows */
 }
+table tr[data-status="Pending"] {
+    background-color: #ffdddd; /* Optional: highlight pending rows */
+}
+
+table tr[data-status="Approved"] {
+    background-color: #ddffdd; /* Optional: highlight approved rows */
+}
 .action-icons{
     display: flex;
     justify-content: center; /* Center the icons horizontally */
@@ -248,6 +273,28 @@ table tr:nth-child(odd) {
 }
 #printbtn:hover {
     background-color: #BF612D; 
+}
+
+select {
+    padding: 3.3px 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+}
+select:focus {
+    outline: none;
+}
+#updateSttsbtn{
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #BF612D;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+}
+#updateSttsbtn:hover {
+    background-color: #48332E;
 }
 </style>
 <body>
@@ -319,7 +366,17 @@ table tr:nth-child(odd) {
                         echo "<td style='text-align: center'>" . htmlspecialchars($row['STUID']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['STUNAME']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['STUEMAIL']) . "</td>";
-                        echo "<td style='text-align: center'>" . htmlspecialchars($row['STATUS']) . "</td>";
+                        echo "<td style='text-align: center'>";
+                            if ($row['STATUS'] == 'Pending') {
+                                echo "<select  data-id='" . htmlspecialchars($row['STUID']) . "'>";
+                                echo "<option value='Pending' selected>Pending</option>";
+                                echo "<option value='Approved'>Approved</option>";
+                                echo "</select>";
+                                echo "<button id='updateSttsbtn' onclick='updateStatus(\"" . htmlspecialchars($row['STUID']) . "\")'>Update</button>";
+                            } else {
+                                echo htmlspecialchars($row['STATUS']);
+                            }
+                        echo "</td>";
                         echo "<td class='action-icons'>";
                         echo "<a href='viewstudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-eye' aria-hidden='true'></i></a>";
                         echo "<a href='editStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-pencil' aria-hidden='true'></i></a>";
@@ -352,6 +409,49 @@ table tr:nth-child(odd) {
             }
         });
     }
+
+    function updateStatus(studentId) {
+        const selectElement = document.querySelector(`.status-dropdown[data-id='${studentId}']`);
+        const newStatus = selectElement.value;
+
+        fetch('listofstudent.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `id=${studentId}&status=${newStatus}`
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.trim() === 'success') {
+                // Reload the page immediately to see the updated status
+                location.reload();
+            } else {
+                // Show an alert if the update failed
+                alert('Failed to update status.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the status.');
+        });
+    }
+
+    // Sort the Rows
+    document.addEventListener('DOMContentLoaded', function () {
+        const table = document.querySelector('table');
+        const rows = Array.from(table.rows).slice(1); // Exclude the header row
+
+        rows.sort((a, b) => {
+            const statusA = a.getAttribute('data-status');
+            const statusB = b.getAttribute('data-status');
+            if (statusA === 'Pending' && statusB === 'Approved') return -1;
+            if (statusA === 'Approved' && statusB === 'Pending') return 1;
+            return 0;
+        });
+
+        rows.forEach(row => table.appendChild(row));
+    });
     </script>
 </body>
 </html>
