@@ -64,6 +64,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
         echo "<script>alert('Error updating profile.');</script>";
     }
 
+<<<<<<< HEAD
     $newProfileImage = $_FILES['CLERKIMAGE']['name'];
 
     // Image upload handling
@@ -143,6 +144,9 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
     $updateStmt->close();
     header("Location: ClerkProfile.php");
     exit;
+=======
+    
+>>>>>>> 80e9563145ba8e378be26179a370128f254feebc
 }
 ?>
 
