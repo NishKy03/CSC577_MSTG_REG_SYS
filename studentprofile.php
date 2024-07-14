@@ -329,7 +329,7 @@ $dbCon->close();
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
             </div>
             <div class="image-wrap">
-                <img src="<?php echo !empty($studentInfo['STUIMAGE']) ? 'image/' . htmlspecialchars($studentInfo['STUIMAGE']) : 'default-profile.png'; ?>" alt="Profile Picture">
+                <img src="<?php echo !empty($studentInfo['STUIMAGE']) ? 'STUDENT/' . htmlspecialchars($studentInfo['STUIMAGE']) : 'default-profile.png'; ?>" alt="Profile Picture">
             </div>
             <div class="profile-wrapper">
                 <h2>PERSONAL INFORMATION</h2>

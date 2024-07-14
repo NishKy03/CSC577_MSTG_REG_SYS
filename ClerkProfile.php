@@ -10,12 +10,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $username = $_SESSION['username'];
 
 // Fetch the student's full name
-$sql = "SELECT clerkName, clerkImage FROM clerk WHERE CLERKID = ?";
+$sql = "SELECT CLERKNAME, CLERKIMAGE FROM clerk WHERE CLERKID = ?";
 $stmt = $dbCon->prepare($sql);
 $stmt->bind_param("i", $username);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($fullName, $clerkImage);
+$stmt->bind_result($fullName, $CLERKIMAGE);
 $stmt->fetch();
 $stmt->close();
 
@@ -340,17 +340,7 @@ table tr td{
                     <tr>
                         <td>
                             <div class="image-wrap">
-                            <form id="profile-picture-form" action="uploadProfilePicture.php" method="post" enctype="multipart/form-data">
-                                <label for="profile-picture-upload">
-                                    <?php if ($clerkImage): ?>
-                                        <img id="profile-picture-preview" src="<?php echo $clerkImage; ?>" alt="Profile Picture" class="profile-picture">
-                                    <?php else: ?>
-                                        <img id="profile-picture-preview" src="images/default_profile.png" alt="Profile Picture" class="profile-picture"> <!-- Default image if no profile picture found -->
-                                    <?php endif; ?>
-                                </label>
-                                <input type="file" id="profile-picture-upload" name="profile_picture" accept="image/*" style="display: none;">
-                                <button type="submit" id="submit-profile-picture" style="display: none;">Upload</button>
-                            </form>
+                            <img src="<?php echo !empty($CLERKIMAGE) ? 'CLERK/' . htmlspecialchars($CLERKIMAGE) : 'default-profile.png'; ?>" alt="Profile Picture">
                             </div>
                         </td>
                         <td>

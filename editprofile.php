@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $newProfileImage = $_FILES['STUIMAGE']['name'];
 
     // Image upload handling
-    $target_dir = "image/";
+    $target_dir = "STUDENT/";
     $target_file = $target_dir . basename($_FILES["STUIMAGE"]["name"]);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));

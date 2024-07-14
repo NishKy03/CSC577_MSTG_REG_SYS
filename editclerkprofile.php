@@ -367,7 +367,6 @@ table tr td{
                     </a>
                 </li>
             </ul>
-            
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
