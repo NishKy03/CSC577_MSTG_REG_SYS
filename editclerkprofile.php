@@ -63,6 +63,86 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
     } else {
         echo "<script>alert('Error updating profile.');</script>";
     }
+
+    $newProfileImage = $_FILES['CLERKIMAGE']['name'];
+
+    // Image upload handling
+    $target_dir = "CLERK/";
+    $target_file = $target_dir . basename($_FILES["CLERKIMAGE"]["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+    // Check if image file is an actual image or fake image
+    if ($newProfileImage) {
+        $check = getimagesize($_FILES["CLERKIMAGE"]["tmp_name"]);
+        if ($check !== false) {
+            $uploadOk = 1;
+        } else {
+            echo "File is not an image.";
+            $uploadOk = 0;
+        }
+
+        // Check file size
+        if ($_FILES["CLERKIMAGE"]["size"] > 500000) {
+            echo "Sorry, your file is too large.";
+            $uploadOk = 0;
+        }
+
+        // Allow certain file formats
+        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $uploadOk = 0;
+        }
+
+        // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+        } else {
+            if (move_uploaded_file($_FILES["CLERKIMAGE"]["tmp_name"], $target_file)) {
+                echo "The file " . htmlspecialchars(basename($_FILES["CLERKIMAGE"]["name"])) . " has been uploaded.";
+                // Update the database with the new image path
+                $stmt = $dbCon->prepare("UPDATE CLERK SET CLERKIMAGE = ? WHERE CLERKID = ?");
+                if ($stmt === false) {
+                    die("Error preparing SQL: " . $dbCon->error);
+                }
+                $stmt->bind_param("ss", basename($_FILES["CLERKIMAGE"]["name"]), $username);
+                if ($stmt->execute()) {
+                    echo "Database updated with new profile image.";
+                } else {
+                    echo "Error updating database: " . $stmt->error;
+                }
+                $stmt->close();
+                // No need to set $STUIMAGE here as it is not used further in the code
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+            }
+        }
+    }
+
+    // Update user data
+    if ($newProfileImage && $uploadOk) {
+        // Update user data including new profile image
+        $updateStmt = $dbCon->prepare("UPDATE CLERK SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ?, CLERKIMAGE = ? WHERE CLERKID = ?");
+        if ($updateStmt === false) {
+            die("Prepare failed: " . $dbCon->error);
+        }
+        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, basename($_FILES["CLERKIMAGE"]["name"]), $username);
+    } else {
+        // Update user data without changing profile image
+        $updateStmt = $dbCon->prepare("UPDATE CLERK SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ? WHERE CLERKID = ?");
+        if ($updateStmt === false) {
+            die("Prepare failed: " . $dbCon->error);
+        }
+        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $username);
+    }
+
+    if (!$updateStmt->execute()) {
+        die("Execute failed: " . $updateStmt->error);
+    }
+
+    $updateStmt->close();
+    header("Location: ClerkProfile.php");
+    exit;
 }
 ?>
 
@@ -367,13 +447,14 @@ table tr td{
                     </a>
                 </li>
             </ul>
+            
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>Profile</p>
             </div>
             <div class="profile-wrap">
-                <form action="editclerkprofile.php" method="POST">
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
                     <table>
                         <tr>
                             <td><b>ID : </b></td>
@@ -399,7 +480,7 @@ table tr td{
                         </tr>
                         <tr>
                             <td><b>Profile Image :</b></td>
-                            <td><input type="file" id="profile_image" name="profile_image" accept="image/*"></td>
+                            <td><input type="file" id="CLERKIMAGE" name="CLERKIMAGE" accept="image/*"></td>
                         </tr>
                         <tr>
                             <td colspan="2" class="center-buttons">
