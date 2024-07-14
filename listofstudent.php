@@ -411,31 +411,32 @@ select:focus {
     }
 
     function updateStatus(studentId) {
-        const selectElement = document.querySelector(`.status-dropdown[data-id='${studentId}']`);
-        const newStatus = selectElement.value;
+    const selectElement = document.querySelector(`.status-dropdown[data-id='${studentId}']`);
+    const newStatus = selectElement.value;
 
-        fetch('listofstudent.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `id=${studentId}&status=${newStatus}`
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data.trim() === 'success') {
-                // Reload the page immediately to see the updated status
-                location.reload();
-            } else {
-                // Show an alert if the update failed
-                alert('Failed to update status.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while updating the status.');
-        });
-    }
+    fetch('listofstudent.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `id=${studentId}&status=${newStatus}`
+    })
+    .then(response => response.text())
+    .then(data => {
+        if (data.trim() === 'success') {
+            // Reload the page immediately to see the updated status
+            location.reload();
+        } else {
+            // Show an alert if the update failed
+            console.error('Failed to update status.');
+            alert('Failed to update status.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the status.');
+    });
+}
 
     // Sort the Rows
     document.addEventListener('DOMContentLoaded', function () {
@@ -443,6 +444,9 @@ select:focus {
         const rows = Array.from(table.rows).slice(1); // Exclude the header row
 
         function sortRows() {
+            const table = document.querySelector('table');
+            const rows = Array.from(table.rows).slice(1); // Exclude the header row
+
             rows.sort((a, b) => {
                 const statusA = a.getAttribute('data-status');
                 const statusB = b.getAttribute('data-status');
