@@ -23,14 +23,24 @@ $stmtStudentCount->fetch();
 $stmtStudentCount->close();
 
 // Query to get total count of unapproved students where status is 'pending'
-$stmtUnapprovedCount = $dbCon->prepare("SELECT COUNT(*) AS total_unapproved FROM student WHERE status = 'pending'");
+$stmtUnapprovedCount = $dbCon->prepare("
+    SELECT COUNT(*) AS total_unapproved 
+    FROM student s 
+    JOIN registration r ON s.stuid = r.stuid 
+    WHERE r.status = 'pending'
+");
 $stmtUnapprovedCount->execute();
 $stmtUnapprovedCount->bind_result($totalUnapproved);
 $stmtUnapprovedCount->fetch();
 $stmtUnapprovedCount->close();
 
-// Query to get total count of unapproved students where status is 'pending'
-$stmtApprovedCount = $dbCon->prepare("SELECT COUNT(*) AS total_approved FROM student WHERE status = 'Approved'");
+// Query to get total count of approved students where status is 'approved'
+$stmtApprovedCount = $dbCon->prepare("
+    SELECT COUNT(*) AS total_approved 
+    FROM student s 
+    JOIN registration r ON s.stuid = r.stuid 
+    WHERE r.status = 'Approved'
+");
 $stmtApprovedCount->execute();
 $stmtApprovedCount->bind_result($totalApproved);
 $stmtApprovedCount->fetch();
