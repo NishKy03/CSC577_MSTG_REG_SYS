@@ -8,9 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'dbConnect.php'; // Adjust the path as per your project structure
 
 // Retrieve clerkID from session or set a default value
-$clerkID = isset($_SESSION['username']) ? $_SESSION['username'] : null;
-$clerkType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
-$studentType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
+$userID = isset($_SESSION['username']) ? $_SESSION['username'] : null;
+$userType = isset($_SESSION['userType']) ? $_SESSION['userType'] : null;
 
 if ($clerkID !== null) {
     // Check if a file was uploaded
@@ -33,33 +32,63 @@ if ($clerkID !== null) {
         // Check if file type is allowed
         if (in_array($fileExt, $allowedExtensions)) {
             // Generate a unique file name
-            $newFileName = 'profile_' . $clerkID . '.' . $fileExt;
+            $newFileName = 'profile_' . $userID . '.' . $fileExt;
 
-            // File destination path
-            $uploadPath = 'image/profile/' . $newFileName;
+            // Redirect to profile page or display success message
+            if ($userType == 'clerk') {
+                        // File destination path
+                $uploadPath = 'clerks/image/profile/' . $newFileName;
 
-            // Move uploaded file to destination
-            if (move_uploaded_file($fileTempName, $uploadPath)) {
-                // Update profile picture path in the database
-                $updateQuery = "UPDATE clerk SET CLERKIMAGE = ? WHERE CLERKID = ?";
-                $stmt = $dbCon->prepare($updateQuery);
-                $stmt->bind_param('si', $uploadPath, $clerkID);
-                $stmt->execute();
-                $stmt->close();
-
-                // Redirect to profile page or display success message
-                if ($clerkType == 'clerk') {
+                    // Move uploaded file to destination
+                if (move_uploaded_file($fileTempName, $uploadPath)) {
+                    // Update profile picture path in the database
+                    $updateQuery = "UPDATE clerk SET CLERKIMAGE = ? WHERE CLERKID = ?";
+                    $stmt = $dbCon->prepare($updateQuery);
+                    $stmt->bind_param('si', $uploadPath, $clerkID);
+                    $stmt->execute();
+                    $stmt->close();
                     echo "<script>alert('Profile picture uploaded successfully.');
                     window.location.href = 'ClerkProfile.php'; </script>";
-                } else if ($clerkType == 'admin') {
-                    echo "<script>alert('Profile picture uploaded successfully.');
-                    window.location.href = 'ClerkProfile.php'; </script>";
+                } else {
+                    echo "<script>alert('Sorry, there was an error uploading your file for clerk.');</script>";
                 }
-                else if ($clerkType == 'student') {
+            } else if ($userType == 'admin') {
+                // File destination path
+                $uploadPath = 'admins/image/profile/' . $newFileName;
+
+                // Move uploaded file to destination
+                if (move_uploaded_file($fileTempName, $uploadPath)) {
+                    // Update profile picture path in the database
+                    $updateQuery = "UPDATE admin SET ADMINIMAGE = ? WHERE ADMINID = ?";
+                    $stmt = $dbCon->prepare($updateQuery);
+                    $stmt->bind_param('si', $uploadPath, $clerkID);
+                    $stmt->execute();
+                    $stmt->close();
                     echo "<script>alert('Profile picture uploaded successfully.');
-                    window.location.href = 'editprofile.php'; </script>";
+                    window.location.href = 'adminProfile.php'; </script>";
+                } else {
+                    echo "<script>alert('Sorry, there was an error uploading your file for admin.');</script>";
                 }
-            } else {
+            }
+            else if ($userType == 'student') {
+                // File destination path
+                $uploadPath = 'students/image/profile/' . $newFileName;
+
+                // Move uploaded file to destination
+                if (move_uploaded_file($fileTempName, $uploadPath)) {
+                    // Update profile picture path in the database
+                    $updateQuery = "UPDATE student SET STUIMAGE = ? WHERE STUID = ?";
+                    $stmt = $dbCon->prepare($updateQuery);
+                    $stmt->bind_param('si', $uploadPath, $clerkID);
+                    $stmt->execute();
+                    $stmt->close();
+                    echo "<script>alert('Profile picture uploaded successfully.');
+                    window.location.href = 'studentProfile.php'; </script>";
+                } else {
+                    echo "<script>alert('Sorry, there was an error uploading your file for student.');</script>";
+                }
+            }
+            else {
                 echo "Sorry, there was an error uploading your file.";
             }
         } else {

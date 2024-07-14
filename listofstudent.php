@@ -309,7 +309,7 @@ table tr:nth-child(odd) {
                         echo "<td class='action-icons'>";
                         echo "<a href='viewstudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-eye' aria-hidden='true'></i></a>";
                         echo "<a href='editStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-pencil' aria-hidden='true'></i></a>";
-                        echo "<a href='printStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-print' aria-hidden='true'></i></a>";
+                        echo "<a href='printStudentReport.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-print' aria-hidden='true'></i></a>";
                         echo "<a href='javascript:void(0);' onclick='deleteStudent(\"" . htmlspecialchars($row['STUID']) . "\", \"" . htmlspecialchars($row['STUNAME']) . "\");'><i class='fa fa-trash' aria-hidden='true'></i></a>";
                         echo "</td>";
                         echo "</tr>";
