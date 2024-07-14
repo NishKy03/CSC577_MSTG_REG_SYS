@@ -126,7 +126,7 @@ $dbCon->close();
             <div class="icon-container">
             <a href="editclerk.php?clerkid=<?php echo $clerk['CLERKID']; ?>"><i class="fa fa-pencil"></i></a>
                 <a href="deleteclerk.php?clerkid=<?php echo $clerkId; ?>" onclick="return confirm('Are you sure you want to delete this clerk?');"><i class="fa fa-trash"></i></a>
-                <a href="#" onclick="printProfile()"><i class="fa fa-print"></i></a>
+                <a href="printclerk.php?clerkid=<?php echo $clerkId; ?>"><i class="fa fa-print"></i></a>
             </div>
             <?php else: ?>
             <p>No profile details found for this clerk.</p>
@@ -136,9 +136,6 @@ $dbCon->close();
         function showEditForm() {
             document.querySelector('.profile-container').style.display = 'none';
             document.querySelector('.edit-container').style.display = 'block';
-        }
-        function printProfile() {
-            window.print();
         }
     </script>
 </body>
