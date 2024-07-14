@@ -22,8 +22,22 @@ $stmtStudentCount->bind_result($totalStudents);
 $stmtStudentCount->fetch();
 $stmtStudentCount->close();
 
+// Query to get total count of unapproved students where status is 'pending'
+$stmtUnapprovedCount = $dbCon->prepare("SELECT COUNT(*) AS total_unapproved FROM student WHERE status = 'pending'");
+$stmtUnapprovedCount->execute();
+$stmtUnapprovedCount->bind_result($totalUnapproved);
+$stmtUnapprovedCount->fetch();
+$stmtUnapprovedCount->close();
+
+// Query to get total count of unapproved students where status is 'pending'
+$stmtApprovedCount = $dbCon->prepare("SELECT COUNT(*) AS total_approved FROM student WHERE status = 'Approved'");
+$stmtApprovedCount->execute();
+$stmtApprovedCount->bind_result($totalApproved);
+$stmtApprovedCount->fetch();
+$stmtApprovedCount->close();
+
 // Query to get gender distribution of students, excluding null values
-$stmtGenderDistribution = $dbCon->prepare("SELECT stugender AS gender, COUNT(*) as count FROM student WHERE stugender IN ('male', 'female') GROUP BY stugender");
+$stmtGenderDistribution = $dbCon->prepare("SELECT stugender AS gender, COUNT(*) as count FROM student WHERE stugender IN ('Male', 'Female') GROUP BY stugender");
 $stmtGenderDistribution->execute();
 $resultGenderDistribution = $stmtGenderDistribution->get_result();
 $genderData = [];
@@ -507,14 +521,14 @@ body.dark .home .text{
                 <div class="icon-class3">
                     <span><i class="fas fa-calendar-check"></i></span>
                 </div>
-                <p><b>10</b></p>
+                <p><b><?php echo $totalApproved; ?></b></p>
             </div>
             <div class="show-box4">
                 <h3>Total Unapproved</h3>
                 <div class="icon-class4">
                     <span><i class="fa fa-spinner" aria-hidden="true"></i></span>
                 </div>
-                <p><b>5</b></p>
+                <p><b><?php echo $totalUnapproved; ?></b></p>
             </div>
         </div>
         <div class="content-in-pie">
