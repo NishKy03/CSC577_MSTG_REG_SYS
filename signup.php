@@ -7,15 +7,17 @@ $STUID_err = $STUNAME_err = $STUEMAIL_err = $STUPNO_err = $STUPASSWORD_err = $co
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate the student name
-    if (empty($STUNAME)) {
+    if (empty(trim($_POST["STUNAME"]))) {
         $STUNAME_err = "Please enter your full name.";
-    } else{
+    } else {
         $STUNAME = trim($_POST["STUNAME"]);
         if (!preg_match("/^[a-zA-Z-' ]*$/", $STUNAME)) {
             $STUNAME_err = "Only letters and white space allowed";
         }
     }
-    if (empty($STUEMAIL)) {
+
+    // Validate the student email
+    if (empty(trim($_POST["STUEMAIL"]))) {
         $STUEMAIL_err = "Please enter your email.";
     } else {
         $STUEMAIL = trim($_POST["STUEMAIL"]);
@@ -23,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $STUEMAIL_err = "Invalid email format.";
         }
     }
-    if (empty($STUPNO)) {
+
+    // Validate the student phone number
+    if (empty(trim($_POST["STUPNO"]))) {
         $STUPNO_err = "Please enter your phone number.";
     } else {
         $STUPNO = trim($_POST["STUPNO"]);
@@ -31,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $STUPNO_err = "Phone Number must be in format 'XXX-XXXXXXXX' or 'XXX-XXXXXXX'";
         }
     }
-    if (empty($STUPASSWORD)) {
+
+    // Validate the student password
+    if (empty(trim($_POST["STUPASSWORD"]))) {
         $STUPASSWORD_err = "Please enter a password.";
     } else {
         $STUPASSWORD = trim($_POST["STUPASSWORD"]);
@@ -39,19 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $STUPASSWORD_err = "Password must have at least 3 characters.";
         }
     }
-    if (empty($confirm_password)) {
+
+    // Validate confirm password
+    if (empty(trim($_POST["confirm_password"]))) {
         $confirm_password_err = "Please confirm your password.";
     } else {
         $confirm_password = trim($_POST["confirm_password"]);
-        if (strlen($confirm_password) < 3) {
-            $confirm_password_err = "Password must have at least 3 characters.";
+        if ($STUPASSWORD !== $confirm_password) {
+            $confirm_password_err = "Passwords do not match.";
         }
     }
-    
 
-    if ($STUPASSWORD !== $confirm_password) {
-        echo "<script>alert('Passwords do not match.');</script>";
-    } else {
+    if (empty($STUNAME_err) && empty($STUEMAIL_err) && empty($STUPNO_err) && empty($STUPASSWORD_err) && empty($confirm_password_err)) {
         // Check the highest STUID and increment it by 1
         $sql = "SELECT MAX(STUID) AS max_id FROM STUDENT";
         $result = $dbCon->query($sql);
@@ -62,10 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($STUID) {
                 $newID = str_pad((int)$STUID + 1, 3, '0', STR_PAD_LEFT);
             } else {
-                $newID = '10001';
+                $newID = '001';
             }
         } else {
-            $newID = '10001';
+            $newID = '001';
         }
 
         // Insert the new student into the database
@@ -91,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Close the statement and the connection
         $stmt->close();
+        $stmt2->close();
         $dbCon->close();
     }
 }
@@ -206,15 +212,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Sign Up</h1>
             <p style="text-align: center; font-family: inter; color: rgba(0, 0, 0, 0.705); padding-bottom: 30px;">Create a new account</p>
             
-            <input type="text" name="STUNAME" id="STUNAME" placeholder="Enter full name" value="<?= isset($STUNAME) ? $STUNAME : ''?>" required>
+            <input type="text" name="STUNAME" id="STUNAME" placeholder="Enter full name" required>
             <span id="StuNameError" class="error"><?php echo $STUNAME_err?></span>
-            <input type="text" name="STUEMAIL" id="STUEMAIL" placeholder="Enter email" value="<?= isset($STUEMAIL) ? $STUEMAIL : '' ?>" required>
+            <input type="text" name="STUEMAIL" id="STUEMAIL" placeholder="Enter email"required>
             <span id="StuEmailError" class="error"><?php echo $STUEMAIL_err?></span>
-            <input type="text" name="STUPNO" id="STUPNO" placeholder="Enter phone no" value="<?= isset($STUPNO) ? $STUPNO : ''?>" required>
+            <input type="text" name="STUPNO" id="STUPNO" placeholder="Enter phone no" required>
             <span id="StuPNOError" class="error"><?php echo $STUPNO_err?></span>
-            <input type="password" name="STUPASSWORD" id="STUPASSWORD" placeholder="Enter password" value="<?= isset($STUPASSWORD) ? $STUPASSWORD : ''?>" required>
+            <input type="password" name="STUPASSWORD" id="STUPASSWORD" placeholder="Enter password"  required>
             <span id="StuPasswordError" class="error"><?php echo $STUPASSWORD_err?></span>
-            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" value="<?= isset($confirm_password) ? $confirm_password : ''?>" required>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password"  required>
             <span id="confirm_passwordError" class="error"><?php echo $confirm_password_err?></span>
             <input type="submit" name="submit" value="SIGN UP">
         </form>
