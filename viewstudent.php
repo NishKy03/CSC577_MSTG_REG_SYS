@@ -252,6 +252,18 @@ $dbCon->close();
 .table-class td:first-child {
     width: 300px; /* Adjust the width of the first column */
 }
+#printbtn {
+    background-color: #BF612D;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+#printbtn:hover {
+    background-color: #48332E;
+}
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -348,6 +360,7 @@ $dbCon->close();
                         <td><?= isset($SALARY) ? "RM ".$SALARY : 'NULL'?></td>
                     </tr>
                 </table>
+                <a id="printbtn" href="printStudentReport.php?id=<?= $STUID; ?>">PRINT <i class='fa fa-print' aria-hidden='true'></i></a>
             </div>
         </section>
     </div>
