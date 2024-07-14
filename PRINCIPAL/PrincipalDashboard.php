@@ -21,8 +21,19 @@ $stmtStudentCount->execute();
 $stmtStudentCount->bind_result($totalStudents);
 $stmtStudentCount->fetch();
 $stmtStudentCount->close();
-?>
 
+// Query to get gender distribution of students, excluding null values
+$stmtGenderDistribution = $dbCon->prepare("SELECT stugender AS gender, COUNT(*) as count FROM student WHERE stugender IN ('male', 'female') GROUP BY stugender");
+$stmtGenderDistribution->execute();
+$resultGenderDistribution = $stmtGenderDistribution->get_result();
+$genderData = [];
+while ($row = $resultGenderDistribution->fetch_assoc()) {
+    $genderData[] = $row;
+}
+$stmtGenderDistribution->close();
+
+$dbCon->close();
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +43,6 @@ $stmtStudentCount->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" />
@@ -354,51 +364,37 @@ body.dark .home .text{
     color: var(--text-color);
 }
 .content-in {
-    width: 100%;
-    display: flex; /* Ensure the child elements are in a row */
-    align-items: flex-start; /* Align items at the top */
-    gap: 20px; /* Optional: Add space between boxes */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 40px;
-    margin-left: 20px;
-    padding: 10px;
 }
 
-.show-box1, .show-box2, .show-box3, .show-box4, .show-box5, .show-box6{
+.content-in .content-in-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.show-box1,
+.show-box2,
+.show-box3,
+.show-box4, 
+.show-box5 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: white;
-}
-.show-box1{
-    display: inline-block;
     width: 300px;
-    margin-left: 40px;
-    margin-right: 100px;
     padding: 20px;
-    text-align: right;
-    position: relative;
+    text-align: center;
     border: 1px solid #ccc;
     border-radius: 10px;
 }
-.show-box2{
-    display: inline-block;
-    width: 300px;
-    border: 1px solid #ccc;
-    margin-right: 100px;
-    padding: 20px;
-    text-align: right;
-    position: relative;
-    border-radius: 10px;
-}
-.show-box3{
-    display: inline-block;
-    width: 300px;
-    border: 1px solid black;
-    padding: 20px;
-    text-align: right;
-    position: relative;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-}
-.icon-class1, .icon-class2, .icon-class3, .icon-class4 {
+
+.icon-class1,
+.icon-class2,
+.icon-class3,
+.icon-class4,
+.icon-class5 {
     position: absolute;
     width: 60px;
     height: 60px;
@@ -406,30 +402,45 @@ body.dark .home .text{
     align-items: center;
     margin-top: -80px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
-    display: flex; /* Ensure flex layout for centering */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
     color: white;
     font-size: 25px;
 }
-.icon-class1{
+
+.icon-class1 {
     background: #4caf50;
 }
-.icon-class2{
+
+.icon-class2 {
     background: #0492c2;
 }
-.icon-class3{
+
+.icon-class3 {
     background: #f09c48;
 }
-.icon-class4{
+
+.icon-class4 {
     background: #ffea17;
 }
-.content-in h3 {
-    font-size: 18px;
-    color: grey;
-    margin-bottom: 10px;
+
+.icon-class5 {
+    background: #ffea18;
 }
-.content-in p{
-    font-size: 25px;
+
+.content-in-pie {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.content-in-pie .show-box4 {
+    width: 400px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
 }
 
 </style>
@@ -471,12 +482,12 @@ body.dark .home .text{
                 </ul>
             </div>
         </div>
-
     </nav>
 
     <section class="home">
-        <div class="dashboard-wrapper">Dashboard</div>
-        <div class="content-in"> 
+    <div class="dashboard-wrapper">Dashboard</div>
+    <div class="content-in"> 
+        <div class="content-in-row">
             <div class="show-box1">
                 <h3>Total Clerk</h3>
                 <div class="icon-class1">
@@ -491,14 +502,14 @@ body.dark .home .text{
                 </div>
                 <p><b><?php echo $totalStudents; ?></b></p>
             </div>
-            <div class="show-box2">
+            <div class="show-box3">
                 <h3>Total Approved</h3>
                 <div class="icon-class3">
                     <span><i class="fas fa-calendar-check"></i></span>
                 </div>
                 <p><b>10</b></p>
             </div>
-            <div class="show-box3">
+            <div class="show-box4">
                 <h3>Total Unapproved</h3>
                 <div class="icon-class4">
                     <span><i class="fa fa-spinner" aria-hidden="true"></i></span>
@@ -506,36 +517,79 @@ body.dark .home .text{
                 <p><b>5</b></p>
             </div>
         </div>
-        
-    </section>
+        <div class="content-in-pie">
+            <div class="show-box5">
+                <h3>Student Gender</h3>
+                <canvas id="genderPieChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // PHP data embedded into JavaScript
+            const data = <?php echo json_encode($genderData); ?>;
+            const labels = data.map(item => item.gender);
+            const counts = data.map(item => item.count);
+
+            const ctx = document.getElementById('genderPieChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Student Gender Distribution'
+                        }
+                    }
+                },
+            });
+        });
+
         const body = document.querySelector('body'),
-      sidebar = body.querySelector('nav'),
-      toggle = body.querySelector(".toggle"),
-      searchBtn = body.querySelector(".search-box"),
-      modeSwitch = body.querySelector(".toggle-switch"),
-      modeText = body.querySelector(".mode-text");
+        sidebar = body.querySelector('nav'),
+        toggle = body.querySelector(".toggle"),
+        searchBtn = body.querySelector(".search-box"),
+        modeSwitch = body.querySelector(".toggle-switch"),
+        modeText = body.querySelector(".mode-text");
 
+        toggle.addEventListener("click" , () =>{
+            sidebar.classList.toggle("close");
+        });
 
-toggle.addEventListener("click" , () =>{
-    sidebar.classList.toggle("close");
-})
+        searchBtn.addEventListener("click" , () =>{
+            sidebar.classList.remove("close");
+        });
 
-searchBtn.addEventListener("click" , () =>{
-    sidebar.classList.remove("close");
-})
-
-modeSwitch.addEventListener("click" , () =>{
-    body.classList.toggle("dark");
-    
-    if(body.classList.contains("dark")){
-        modeText.innerText = "Light mode";
-    }else{
-        modeText.innerText = "Dark mode";
-        
-    }
-});
+        modeSwitch.addEventListener("click" , () =>{
+            body.classList.toggle("dark");
+            
+            if(body.classList.contains("dark")){
+                modeText.innerText = "Light mode";
+            }else{
+                modeText.innerText = "Dark mode";
+            }
+        });
     </script>
 
 </body>
