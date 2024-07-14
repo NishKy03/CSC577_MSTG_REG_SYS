@@ -9,7 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $username = $_SESSION['username'];
 
-// Fetch the student's full name
+// Fetch the admin's full name
 $sql = "SELECT CLERKNAME FROM clerk WHERE CLERKID = ?";
 $stmt = $dbCon->prepare($sql);
 $stmt->bind_param("s", $username);
@@ -21,6 +21,39 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
+// Fetch the total number of clerks
+$sql = "SELECT COUNT(*) FROM clerk";
+$result = $dbCon->query($sql);
+$totalClerks = $result->fetch_row()[0];
+
+// Fetch the total number of students
+$sql = "SELECT COUNT(*) FROM student";
+$result = $dbCon->query($sql);
+$totalStudents = $result->fetch_row()[0];
+
+// Fetch the total number of principals
+$sql = "SELECT COUNT(*) FROM principal";
+$result = $dbCon->query($sql);
+$totalPrincipals = $result->fetch_row()[0];
+
+// Fetch the total number of users registered today
+$sql = "SELECT COUNT(*) FROM registration WHERE DATE(regdate) = CURDATE()";
+$result = $dbCon->query($sql);
+$newRegistrationsToday = $result->fetch_row()[0];
+
+$totalUsers = $totalPrincipals + $totalStudents + $totalClerks;
+
+$sql = "SELECT COUNT(*) AS count, DATE_FORMAT(regdate, '%Y-%m') AS month FROM registration GROUP BY month ORDER BY month";
+$result = $dbCon->query($sql);
+
+$months = [];
+$counts = [];
+
+while ($row = $result->fetch_assoc()) {
+    $months[] = $row['month'];
+    $counts[] = $row['count'];
+}
+
 $dbCon->close();
 ?>
 
@@ -31,58 +64,61 @@ $dbCon->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
-    <title>Clerk Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>Admin Dashboard</title>
 </head>
 <style>
+/* Existing styles */
 * {
-	padding: 0;
-	margin: 0;
-	box-sizing: border-box;
-	font-family: arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: arial, sans-serif;
 }
 .header {
-	display: flex;
-	align-items: center;
-	padding: 28px 30px;
-	background: #EFD577;
-	color: white;
+    display: flex;
+    align-items: center;
+    padding: 28px 30px;
+    background: #EFD577;
+    color: white;
 }
 .welcome-name {
-	font-size: 25px;
-	margin-left: 40px;
+    font-size: 25px;
+    margin-left: 40px;
 }
 .header i {
-	font-size: 30px;
-	cursor: pointer;
-	color: black;
+    font-size: 30px;
+    cursor: pointer;
+    color: black;
 }
 .header a{
     text-decoration: none;
     color: black;
 }
 .header i:hover {
-	color: #127b8e;
+    color: #127b8e;
 }
 .right-icon {
-	margin-left: auto;
+    margin-left: auto;
 }
 .right-icon i {
-	margin-right: 15px; 
+    margin-right: 15px; 
 }
 .right-icon i:last-child {
-	margin-right: 0; 
+    margin-right: 0; 
 }
 .user-p {
-	text-align: center;
-	padding-top: 50px;
+    text-align: center;
+    padding-top: 50px;
 }
 .user-p img {
-	width: 150px;
+    width: 150px;
     height: 150px;
-	border-radius: 50%;
+    border-radius: 50%;
 }
 .body {
-	display: flex;
+    display: flex;
 }
 .side-bar {
     width: 350px;
@@ -106,13 +142,9 @@ $dbCon->close();
     border: none;
     border-top: 1px solid grey;  /* Fixed border syntax */
 }
-
 .side-bar ul li:hover {
     background: #EFD577;
     font-weight: bold;
-}
-.side-bar ul li:hover > ul {
-    display: block; /* Display submenu on hover */
 }
 .side-bar ul li a {
     text-decoration: none;
@@ -120,19 +152,13 @@ $dbCon->close();
     cursor: pointer;
     letter-spacing: 1px;
 }
-.side-bar  i {
+.side-bar i {
     display: inline-block;
     padding-right: 10px;
     width: 30px;
     vertical-align: center;
     font-size: 25px;
     color: white;
-}
-.side-bar ul li a {
-    text-decoration: none;
-    color: #black;
-    cursor: pointer;
-    letter-spacing: 1px;
 }
 .side-bar ul li a i {
     display: inline-block;
@@ -144,10 +170,9 @@ $dbCon->close();
     background-color: #F5EFE7;
     background-size: cover;
     background-position: center;
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     flex-direction: column;
-    
 }
 #navbtn {
     display: inline-block;
@@ -183,7 +208,6 @@ $dbCon->close();
     font-family: "Poppins", sans-serif;
     border-bottom: 1px solid #ccc;
 }
-
 .circled-menu-parent p{
     margin: 0; /* Remove default margins to prevent alignment issues */
     display: flex; /* Use flexbox to align the icon and text */
@@ -191,77 +215,60 @@ $dbCon->close();
     font-size: 25px;
     font-family: "Poppins", sans-serif;
 }
-
 .circled-menu-parent i {
     margin-left: 20px;
     margin-right: 15px; /* Space between the icon and text */
 }
-.profile-wrap{
-    width: 50%;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-top: 100px;
-    padding: 20px;
+h2{
+    margin-top: 20px;
+    width: 92%;
+    padding: 10px;
 }
-table{
-    width: 100%;
+/* New styles */
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    gap: 80px;
 }
-.image-wrap {
+.stat-box {
+    background: white;
     width: 250px;
-    height: 250px;
-    border: 4px solid #7360ff;
-    box shadow: 0 0 10px rgba(0,0,0,0.3);
-    border-radius: 10%;
-    overflow: hidden; 
-    margin-left: 40px;
-}
-
-.image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire area while maintaining aspect ratio */
-    object-position: center; /* Centers the image within the frame */
-}
-
-table tr td{
-    padding: 10px 15px;
-}
-.clerkinput{
-    width: 300px;
-    line-height: 1.5;
-    margin-top: 15px;
-}
-.clerkinput1{
-    width: 300px;
-    line-height: 1.5;
-    margin-top: 40px;
-}
-.clerkinput span, .clerkinput1 span{
-    color: #808080;
-    font-weight: 600;
-}
-.edit-button{
-    display: inline-flex;
-    background-color: #7360ff;
-    padding: 10px 15px;
-    margin-top: 5px;
+    height: 170px;
     border-radius: 10px;
-    transition: background-color 0.3s ease;
-    margin-left: 53%;
-    margin-top: 40px;
-
+    padding: 20px 30px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    text-align: center;
 }
-.edit-button a {
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 600;
-    color: white;
+.stat-box h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: grey;
 }
-.edit-button i{
-    margin-right: 8px;
+.stat-box p {
+    font-size: 35px;
+    font-weight: bold;
 }
-.edit-button:hover{
-    background-color: #5a47d8;
+.stat-box i{
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+.graph{
+    width: 600px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; /* Stacks children vertically */
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+h4{
+    font-size: 25px;
 }
 </style>
 <body>
@@ -307,8 +314,55 @@ table tr td{
             <div class="circled-menu-parent">
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>Dashboard</p>
             </div>
-            <h2 class="welcome-name">Welcome back, Admin <span style="color: #48332E;"><?php echo htmlspecialchars($firstName); ?></span> !</h2>
+            <h2>Welcome back, Admin <span style="color: #48332E;"><?php echo htmlspecialchars($firstName); ?></span>!</h2>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <span style="color: #252C65;"><i class="fa fa-users" aria-hidden="true"></i></span>
+                    <h3>Total Users</h3>
+                    <p><?php echo htmlspecialchars($totalUsers); ?></p> <!-- Example value, fetch from the database -->
+                </div>
+                <div class="stat-box">
+                    <span style="color: #DAB01C;"><i class="fa fa-building-o" aria-hidden="true"></i></span>
+                    <h3>Total Clerk</h3>
+                    <p><?php echo htmlspecialchars($totalClerks); ?></p> <!-- Example value, fetch from the database -->
+                </div>
+                <div class="stat-box">
+                <span style="color: #B10DAB;"><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span>
+                    <h3>New Registrations</h3>
+                    <p><?php echo htmlspecialchars($newRegistrationsToday); ?></p> <!-- Example value, fetch from the database -->
+                </div>
+                <div class="graph">
+                    <h4 style="margin-top: 40px;">Monthly Registrations</h4>
+                    <canvas id="registrationChart" width="400" height="200"></canvas>
+                </div>
+                
+            </div>
+                
         </section>
     </div>
+    <script>
+const ctx = document.getElementById('registrationChart').getContext('2d');
+const registrationChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: <?php echo json_encode($months); ?>, // Month labels
+        datasets: [{
+            label: 'Registrations',
+            data: <?php echo json_encode($counts); ?>, // Registration counts
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 2,
+            fill: true,
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
 </body>
 </html>
