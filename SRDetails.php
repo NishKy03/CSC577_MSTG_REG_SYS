@@ -33,9 +33,6 @@ if (isset($_GET["id"]) && !empty(trim($_GET["id"]))) {
                 $stuMotherName = $row["MOTHERNAME"];
                 $stuParentsSalary = $row["SALARY"];
                 $stuImage = $row["STUIMAGE"];
-                $status = $row["STATUS"];
-
-
             } else {
                 exit();
             }
