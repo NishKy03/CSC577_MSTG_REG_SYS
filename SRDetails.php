@@ -1,21 +1,19 @@
 <?php
-if (isset($_GET["orderID"]) && !empty(trim($_GET["orderID"]))) {
+if (isset($_GET["id"]) && !empty(trim($_GET["id"]))) {
+
+    $param_id = trim($_GET["id"]);
     // Include dbConnect file
     require_once "dbConnect.php";
     
     // Prepare a select statement
-    $sql = "SELECT o.orderID, r.name AS rName, r.phoneNo AS rPhoneNo, r.addressLine1 AS rAddress, r.postcode AS rPostcode, r.city AS rCity, r.state AS rState, s.senderName, s.senderPhoneNo, s.addressLine1 AS sAddress, s.postcode As sPostcode, s.city AS sCity, s.state AS sState, o.orderDate, o.parcelWeight, o.totalAmount, o.insurance
-            FROM orders o, recipient r, sender s
-            WHERE o.senderID = s.senderID
-            AND o.recipientID = r.recipientID
-            AND o.orderID = ?";
+    $sql = "SELECT * FROM STUDENT WHERE stuid = ?";
     
     if ($stmt = mysqli_prepare($dbCon, $sql)) {
         // Bind variables to the prepared statement as parameters
-        mysqli_stmt_bind_param($stmt, "d", $param_id);
+        mysqli_stmt_bind_param($stmt, "i", $param_id);
         
         // Set parameters
-        $param_id = trim($_GET["orderID"]);
+      
         
         // Attempt to execute the prepared statement
         if (mysqli_stmt_execute($stmt)) {
@@ -24,23 +22,20 @@ if (isset($_GET["orderID"]) && !empty(trim($_GET["orderID"]))) {
             if (mysqli_num_rows($result) == 1) {
                 $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
                 
-                $orderID = $row['orderID'];
-                $rName = $row['rName'];
-                $rPhoneNo = $row['rPhoneNo'];
-                $rAddress = $row['rAddress'];
-                $rPostcode = $row['rPostcode'];
-                $rCity = $row['rCity'];
-                $rState = $row['rState'];
-                $sName = $row['senderName'];
-                $sPhoneNo = $row['senderPhoneNo'];
-                $sAddress = $row['sAddress'];
-                $sPostcode = $row['sPostcode'];
-                $sCity = $row['sCity'];
-                $sState = $row['sState'];
-                $orderDate = $row['orderDate'];
-                $weight = $row['parcelWeight'];
-                $amount = $row['totalAmount'];
-                $insurance = $row['insurance'];
+                $stuID = $row["STUID"];
+                $stuName = $row["STUNAME"];
+                $stuEmail = $row["STUEMAIL"];
+                $stuPNO = $row["STUPNO"];
+                $stuAddress = $row["STUADDRESS"];
+                $stuGender = $row["STUGENDER"];
+                $stuDOB = $row["STUDOB"];
+                $stuFatherName = $row["FATHERNAME"];
+                $stuMotherName = $row["MOTHERNAME"];
+                $stuParentsSalary = $row["SALARY"];
+                $stuImage = $row["STUIMAGE"];
+                $status = $row["STATUS"];
+
+
             } else {
                 exit();
             }

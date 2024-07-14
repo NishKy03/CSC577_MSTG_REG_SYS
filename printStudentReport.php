@@ -2,10 +2,9 @@
 <html>
     <head>
         <?php
-            require_once('SWOrderDetails.php');
+            require_once('SRDetails.php');
         ?>
         <script >
-            //alert("Please click Ctrl + P to print the order statement");
             window.print();
         </script>
         <title>Print Order Statement</title>
@@ -15,28 +14,45 @@
                 padding: 20px;
                 max-width: 800px;
                 width: fit-content;
+                max-height: 900px;
+                height: 100%;
                 margin: auto;
                 font-family: "Poppins", sans-serif;
             }
             .section {
                 padding: 10px;
-                margin-bottom: 20px;
-                margin-top: 30%;
+                height: 900px;
+              
             }
             .section table {
                 width: 100%;
+                height: 90%;
                 border-collapse: collapse;
                 background-color: white;
             }
             .section th, .section td {
-                padding: 10px;
-                text-align: center;
+                padding: 3px;
+                text-align: left;
             }
             .section th {
                 background-color: #f0f0f0;
             }
             .section td.all-b {
                 border: 2px solid black;
+                border-right: 0px solid black;
+                text-align: center;
+                margin: 0;
+            }
+            .section td.all-bc {
+                border:2px solid black;
+                border-left: 0px solid black;
+                text-align: end;
+                margin: -20%;
+            }
+            .section td.all-c {
+                border-right:2px solid black;
+                text-align: end;
+                margin: 0;
             }
             .section td.right-b {
                 border-top: 2px solid black;
@@ -53,14 +69,56 @@
                 border-right: 2px solid black;
                 border-left: 2px solid black;
             }
+            .section td.bottom-c {
+                border-top: 2px solid black;
+                border-right: 2px solid black;
+                border-left: 2px solid black;
+                text-align: center;
+            }
             .section td.top-b {
                 border-bottom: 2px solid black;
                 border-right: 2px solid black;
                 border-left: 2px solid black;
             }
-            .section img {
-                height: 50px;
+            .section td.topright-b {
+                border-bottom: 2px solid black;
+                border-left: 2px solid black;
+            }
+            .section td.topbotright-b {
+                border-left: 2px solid black;
+            }
+            .section td.topleft-b {
+                border-bottom: 2px solid black;
+                border-right: 0px solid black;
+            }
+            .section td.topleft-c {
+                border-bottom: 2px solid black;
+                border-right: 2px solid black;
+            }
+            
+            
+            .section td.topbotleft-b {
+                border-right: 0px solid black;
+            }
+            .section td.topbotleft-c {
+                border-right: 2px solid black;
+                text-align: start;
+            }
+            .section tr.details{
+                font-size: small;
+            }
+            .logo {
+                height: 100px;
+                width: 100px;
+                margin-left: 25%;
+            }
+            .profileImage {
+                height: 250px;
                 width: auto;
+            }
+            #ref {
+                text-align: end;
+                font-size: 8px;
             }
         </style>
     </head>
@@ -69,24 +127,63 @@
     <div class="section">
         <table>
             <tr>
-                <td class="right-b"><img src="images/tntlogo.png"></td>
-                <td class="left-b"><h2><?php echo $orderID; ?></h2></td>
+                <td class="all-b" colspan="2"><h2>Alhamdulillah Wa Syukurilah </h2></td>
+                <td class="all-bc"><img class="logo" src="logo.png"><br><p id="ref">58, Jalan Maktab, Taman Orkid, <br>16100 Kota Bharu, Kelantan</p>
+                <p id="ref">09-773 7300</p></td>
             </tr>
             <tr>
-                <td class="bottom-b" style="font-weight:bold; font-size:large;">TO</td>
-                <td class="all-b" rowspan="2" style="word-wrap: break-word; text-align: left;"><?php echo $rName; ?>&nbsp;&nbsp;<?php echo $rPhoneNo; ?>&nbsp;&nbsp;<?php echo $rAddress; ?>,&nbsp;<?php echo $rPostcode; ?>&nbsp;<?php echo $rCity; ?>,&nbsp;<?php echo $rState; ?></td>
+                <td class="bottom-b" colspan="3" style="font-weight:bold; font-size:medium; text-align:center;">STUDENT'S INFORMATION</td>
+                
+                
+                
             </tr>
-            <tr><td class="top-b"><?php echo $rPostcode; ?></td></tr>
+            <tr class="details">
+                <td class="topbotright-b">Student ID: </td>
+                <td ><?php echo $stuID;?></td>
+                <td class="all-c" rowspan="6" style="text-align: center; padding-left:10px; padding-left:10px; padding-right:10px;"><img class="profileImage" src="image/danishpic.png" alt=""></td>
+            </tr>
+            
+            <tr class="details">
+                <td class="topbotright-b" >Name:</td>
+                <td class="topbotleft-b"><?php echo $stuName; ?></td>
+            </tr>
+            <tr class="details">
+                <td class="topbotright-b" >Phone No:</td>
+                <td class="topbotleft-b"><?php echo $stuPNO; ?></td>
+            </tr>
+            <tr class="details">
+                <td class="topbotright-b">Address:</td>
+                <td class="topbotleft-b"><?php echo $stuAddress; ?></td>
+            </tr>
+            <tr class="details">
+                <td class="topbotright-b" >Date Of Birth:</td>
+                <td class="topbotleft-b"><?php // Creating timestamp from given date
+                                            $timestamp = strtotime($stuDOB);
+                                            
+                                            // Creating new date format from that timestamp
+                                            $new_date = date("d-m-Y", $timestamp);
+                                            echo $new_date;  ?></td>
+            </tr>
+            <tr class="details">
+                <td class="topright-b" >Gender:</td>
+                <td class="topleft-b"><?php echo $stuGender; ?></td>
+            </tr>
             <tr>
-                <td class="bottom-b" style="font-weight:bold; font-size:large;">FROM</td>
-                <td class="all-b" rowspan="2" style="word-wrap: break-word; text-align: left;"><?php echo $sName; ?>&nbsp;&nbsp;<?php echo $sPhoneNo; ?>&nbsp;&nbsp;<?php echo $sAddress; ?>,&nbsp;<?php echo $sPostcode; ?>&nbsp;<?php echo $sCity; ?>,&nbsp;<?php echo $sState; ?></td>
+                <td class="bottom-c" colspan="3" style="font-weight:bold; font-size:medium;">PARENTS' INFORMATION</td>
             </tr>
-            <tr><td class="top-b"><?php echo $sPostcode; ?></td></tr>
-            <tr>
-                <td class="all-b"><?php echo $orderDate; ?></td>
-                <td class="all-b" rowspan="2" style="word-wrap: break-word; text-align: left;">Total = RM <?php echo $amount; ?></td>
+            <tr class="details">
+                <td class="topbotright-b" >Father Name:</td>
+                <td class="topbotleft-c" colspan="2"><?php echo $stuFatherName; ?></td>
             </tr>
-            <tr><td class="all-b"><?php echo $weight; ?> KG</td></tr>
+            <tr class="details">
+                <td class="topbotright-b" >Mother Name:</td>
+                <td class="topbotleft-c" colspan="2"><?php echo $stuMotherName; ?></td>
+            </tr>
+            <tr class="details">
+                <td class="topright-b">Parents' Total Salary: </td>
+                <td class="topleft-c" colspan="2"><?php echo "RM ". $stuParentsSalary; ?></td>
+            </tr>
+            <tr></tr>
         </table>
     </div>
     </div>

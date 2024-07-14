@@ -179,8 +179,8 @@ $result = $dbCon->query($sql);
     color: #434343;
     width: 100%;
     display: flex;
-    justify-content: center;
-    flex-direction: column;
+    justify-content: space-between; /* Adjusted for alignment */
+    align-items: center; /* Center vertically */
     padding: 0 20px;
     font-family: "Poppins", sans-serif;
     border-bottom: 1px solid #ccc;
@@ -237,6 +237,18 @@ table tr:nth-child(odd) {
 .action-icons a:hover{
     color: #127b8e;
 }
+#printbtn {
+    background-color:#edbea3;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    
+    cursor: pointer;
+}
+#printbtn:hover {
+    background-color: #BF612D; 
+}
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -285,7 +297,9 @@ table tr:nth-child(odd) {
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
+                
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Student</p>
+                <a href="printStudentList.php" id="printbtn" style="text-decoration: none; color: #000; text-align: end;">Print<i class="fa fa-print" style="font-size:25px;"></i></a>
             </div>
             <table>
                 <tr>
@@ -309,7 +323,7 @@ table tr:nth-child(odd) {
                         echo "<td class='action-icons'>";
                         echo "<a href='viewstudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-eye' aria-hidden='true'></i></a>";
                         echo "<a href='editStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-pencil' aria-hidden='true'></i></a>";
-                        echo "<a href='printStudent.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-print' aria-hidden='true'></i></a>";
+                        echo "<a href='printStudentReport.php?id=" . htmlspecialchars($row['STUID']) . "'><i class='fa fa-print' aria-hidden='true'></i></a>";
                         echo "<a href='javascript:void(0);' onclick='deleteStudent(\"" . htmlspecialchars($row['STUID']) . "\", \"" . htmlspecialchars($row['STUNAME']) . "\");'><i class='fa fa-trash' aria-hidden='true'></i></a>";
                         echo "</td>";
                         echo "</tr>";
