@@ -21,14 +21,14 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
-$sql = "SELECT * FROM student";
+$sql = "SELECT s.STUID, s.STUNAME, s.STUEMAIL, r.STATUS, r.CLERKID FROM student as s JOIN registration as r ON s.STUID = r.STUID";
 $result = $dbCon->query($sql);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $studentId = $_POST['id'];
     $newStatus = $_POST['status'];
 
-    $sql = "UPDATE student SET STATUS = ? WHERE STUID = ?";
+    $sql = "UPDATE registration SET STATUS = ? WHERE STUID = ?";
     $stmtUpdate = $dbCon->prepare($sql);
     $stmtUpdate->bind_param("ss", $newStatus, $studentId);
 
@@ -368,7 +368,7 @@ select:focus {
                         echo "<td>" . htmlspecialchars($row['STUEMAIL']) . "</td>";
                         echo "<td style='text-align: center'>";
                             if ($row['STATUS'] == 'Pending') {
-                                echo "<select  data-id='" . htmlspecialchars($row['STUID']) . "'>";
+                                echo "<select class='status-dropdown' data-id='" . htmlspecialchars($row['STUID']) . "'>";
                                 echo "<option value='Pending' selected>Pending</option>";
                                 echo "<option value='Approved'>Approved</option>";
                                 echo "</select>";
@@ -442,15 +442,20 @@ select:focus {
         const table = document.querySelector('table');
         const rows = Array.from(table.rows).slice(1); // Exclude the header row
 
-        rows.sort((a, b) => {
-            const statusA = a.getAttribute('data-status');
-            const statusB = b.getAttribute('data-status');
-            if (statusA === 'Pending' && statusB === 'Approved') return -1;
-            if (statusA === 'Approved' && statusB === 'Pending') return 1;
-            return 0;
-        });
+        function sortRows() {
+            rows.sort((a, b) => {
+                const statusA = a.getAttribute('data-status');
+                const statusB = b.getAttribute('data-status');
+                if (statusA === 'Pending' && statusB === 'Approved') return -1;
+                if (statusA === 'Approved' && statusB === 'Pending') return 1;
+                return 0;
+            });
 
-        rows.forEach(row => table.appendChild(row));
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        // Call sorting function initially
+        sortRows();
     });
     </script>
 </body>
