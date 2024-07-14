@@ -2,13 +2,52 @@
 require_once("dbConnect.php");
 
 $STUID = $STUNAME = $STUEMAIL = $STUPNO = $STUPASSWORD = $confirm_password = "";
+$STUID_err = $STUNAME_err = $STUEMAIL_err = $STUPNO_err = $STUPASSWORD_err = $confirm_password_err = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $STUNAME = trim($_POST['STUNAME']);
-    $STUEMAIL = trim($_POST['STUEMAIL']);
-    $STUPNO = trim($_POST['STUPNO']);
-    $STUPASSWORD = trim($_POST['STUPASSWORD']);
-    $confirm_password = trim($_POST['confirm_password']);
+
+    // Validate the student name
+    if (empty($STUNAME)) {
+        $STUNAME_err = "Please enter your full name.";
+    } else{
+        $STUNAME = trim($_POST["STUNAME"]);
+        if (!preg_match("/^[a-zA-Z-' ]*$/", $STUNAME)) {
+            $STUNAME_err = "Only letters and white space allowed";
+        }
+    }
+    if (empty($STUEMAIL)) {
+        $STUEMAIL_err = "Please enter your email.";
+    } else {
+        $STUEMAIL = trim($_POST["STUEMAIL"]);
+        if (!filter_var($STUEMAIL, FILTER_VALIDATE_EMAIL)) {
+            $STUEMAIL_err = "Invalid email format.";
+        }
+    }
+    if (empty($STUPNO)) {
+        $STUPNO_err = "Please enter your phone number.";
+    } else {
+        $STUPNO = trim($_POST["STUPNO"]);
+        if (!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $STUPNO)) {
+            $STUPNO_err = "Phone Number must be in format 'XXX-XXXXXXXX' or 'XXX-XXXXXXX'";
+        }
+    }
+    if (empty($STUPASSWORD)) {
+        $STUPASSWORD_err = "Please enter a password.";
+    } else {
+        $STUPASSWORD = trim($_POST["STUPASSWORD"]);
+        if (strlen($STUPASSWORD) < 3) {
+            $STUPASSWORD_err = "Password must have at least 3 characters.";
+        }
+    }
+    if (empty($confirm_password)) {
+        $confirm_password_err = "Please confirm your password.";
+    } else {
+        $confirm_password = trim($_POST["confirm_password"]);
+        if (strlen($confirm_password) < 3) {
+            $confirm_password_err = "Password must have at least 3 characters.";
+        }
+    }
+    
 
     if ($STUPASSWORD !== $confirm_password) {
         echo "<script>alert('Passwords do not match.');</script>";
@@ -23,10 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($STUID) {
                 $newID = str_pad((int)$STUID + 1, 3, '0', STR_PAD_LEFT);
             } else {
-                $newID = '001';
+                $newID = '10001';
             }
         } else {
-            $newID = '001';
+            $newID = '10001';
         }
 
         // Insert the new student into the database
@@ -155,6 +194,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .already-have-account a:hover {
         text-decoration: underline;
     }
+    .error {
+        color: red;
+        font-size: 14px;
+        margin-left: 100px;
+    }
 </style>
 <body>
     <div class="wrapper">
@@ -162,11 +206,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Sign Up</h1>
             <p style="text-align: center; font-family: inter; color: rgba(0, 0, 0, 0.705); padding-bottom: 30px;">Create a new account</p>
             
-            <input type="text" name="STUNAME" id="STUNAME" placeholder="Enter full name" required><br>
-            <input type="text" name="STUEMAIL" id="STUEMAIL" placeholder="Enter email" required><br>
-            <input type="text" name="STUPNO" id="STUPNO" placeholder="Enter phone no" required><br>
-            <input type="password" name="STUPASSWORD" id="STUPASSWORD" placeholder="Enter password" required><br>
-            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" required><br>
+            <input type="text" name="STUNAME" id="STUNAME" placeholder="Enter full name" value="<?= isset($STUNAME) ? $STUNAME : ''?>" required>
+            <span id="StuNameError" class="error"><?php echo $STUNAME_err?></span>
+            <input type="text" name="STUEMAIL" id="STUEMAIL" placeholder="Enter email" value="<?= isset($STUEMAIL) ? $STUEMAIL : '' ?>" required>
+            <span id="StuEmailError" class="error"><?php echo $STUEMAIL_err?></span>
+            <input type="text" name="STUPNO" id="STUPNO" placeholder="Enter phone no" value="<?= isset($STUPNO) ? $STUPNO : ''?>" required>
+            <span id="StuPNOError" class="error"><?php echo $STUPNO_err?></span>
+            <input type="password" name="STUPASSWORD" id="STUPASSWORD" placeholder="Enter password" value="<?= isset($STUPASSWORD) ? $STUPASSWORD : ''?>" required>
+            <span id="StuPasswordError" class="error"><?php echo $STUPASSWORD_err?></span>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" value="<?= isset($confirm_password) ? $confirm_password : ''?>" required>
+            <span id="confirm_passwordError" class="error"><?php echo $confirm_password_err?></span>
             <input type="submit" name="submit" value="SIGN UP">
         </form>
         
@@ -180,15 +229,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
+        // Function to validate form fields on submit
         function validateForm() {
-            var password = document.getElementById("STUPASSWORD").value;
-            var confirmPassword = document.getElementById("confirm_password").value;
-            if (password !== confirmPassword) {
-                alert("Passwords do not match.");
-                return false;
+            var isValid = true;
+
+            // Validate Student's Name
+            var StuName = document.getElementById('STUNAME').value.trim();
+            if (!StuName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('StuNameError').innerHTML = 'Please enter a valid name (only letters and spaces, max 50 characters).';
+                isValid = false;
+            } else {
+                document.getElementById('StuNameError').innerHTML = '';
             }
-            return true;
+
+            // Validate Student's Phone Number
+            var StuPhone = document.getElementById('STUPNO').value.trim();
+            if (!StuPhone.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
+                document.getElementById('StuPNOError').innerHTML = 'format: XXX-XXXXXXX or XXX-XXXXXXXX.';
+                isValid = false;
+            } else {
+                document.getElementById('StuPNOError').innerHTML = '';
+            }
+
+            // Validate Student's Email
+            var StuEmail = document.getElementById('STUEMAIL').value.trim();
+            if (!StuEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('StuEmailError').innerHTML = 'Invalid Email.';
+                isValid = false;
+            } else {
+                document.getElementById('StuEmailError').innerHTML = '';
+            }
+
+            // Validate Student's Password
+            var StuPassword = document.getElementById('STUPASSWORD').value.trim();
+            if (StuPassword.length < 3) {
+                document.getElementById('StuPasswordError').innerHTML = 'Password must have at least 3 characters.';
+                if(StuPassword !== document.getElementById('confirm_password').value.trim()) {
+                    document.getElementById('confirm_password').value = '';
+                    document.getElementById('confirm_password').focus();
+                    document.getElementById('confirm_password').placeholder = 'Passwords do not match.';
+
+                    isValid = false;
+                } else {
+                    document.getElementById('confirm_password').placeholder = 'Confirm password';
+                }
+            } else {
+                document.getElementById('StuPasswordError').innerHTML = '';
+            }
+            return isValid;
         }
-    </script>
+
+        // Real-time validation on input change
+        document.getElementById('STUNAME').addEventListener('input', function() {
+            var StuName = this.value.trim();
+            if (!StuName.match(/^[A-Za-z\s@'.\/]{1,255}$/)) {
+                document.getElementById('StuNameError').innerHTML = 'Please enter a valid name (only letters and spaces).';
+            } else {
+                document.getElementById('StuNameError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('STUPNO').addEventListener('input', function() {
+            var StuPNO = this.value.trim();
+            if (!StuPNO.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
+                document.getElementById('StuPNOError').innerHTML = 'format: XXX-XXXXXXX or XXX-XXXXXXXX.';
+            } else {
+                document.getElementById('StuPNOError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('STUEMAIL').addEventListener('input', function() {
+            var StuEmail = this.value.trim();
+            if (!StuEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('StuEmailError').innerHTML = 'Invalid Email.';
+            } else {
+                document.getElementById('StuEmailError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('STUPASSWORD').addEventListener('input', function() {
+            var StuPassword = this.value.trim();
+            if (StuPassword.length < 3) {
+                document.getElementById('StuPasswordError').innerHTML = 'Password must have at least 3 characters.';
+            } else {
+                document.getElementById('StuPasswordError').innerHTML = '';
+            }
+        });
+
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            var StuPassword = document.getElementById('STUPASSWORD').value.trim();
+            var confirm_password = this.value.trim();
+
+            if (confirm_password.length < 3) {
+                document.getElementById('confirm_passwordError').innerHTML = 'Password must have at least 3 characters.';
+            } else if (StuPassword !== confirm_password) {
+                document.getElementById('confirm_passwordError').innerHTML = 'Passwords do not match.';
+            } else {
+                document.getElementById('confirm_passwordError').innerHTML = '';
+            }
+        });
+
+    </script>   
 </body>
 </html>
