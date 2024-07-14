@@ -1,3 +1,82 @@
+<?php
+session_start();
+require_once("../dbConnect.php");
+
+// Check if user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("location: welcome.php"); // Redirect to login page if not logged in
+    exit;
+}
+
+$username = $_SESSION['username'];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $CLERKNAME = $_POST['CLERKNAME'];
+    $CLERKDOB = $_POST['CLERKDOB'];
+    $CLERKPNO = $_POST['CLERKPNO'] ;
+    $CLERKEMAIL = $_POST['CLERKEMAIL'] ;
+    $CLERKPASSWORD = '123'; 
+    $CLERKTYPE = 'clerk'; 
+    $newProfileImage = $_FILES['CLERKIMAGE']['name'];
+
+    // Get the max CLERKID from the database
+    $sql = "SELECT MAX(CLERKID) AS max_clerk_id FROM clerk";
+    $result = $dbCon->query($sql);
+    $row = $result->fetch_assoc();
+    $maxClerkId = $row['max_clerk_id'];
+    $newClerkId = $maxClerkId + 1;
+
+    // Image upload handling
+    $target_dir = "../CLERK/";
+    $target_file = $target_dir . basename($_FILES["CLERKIMAGE"]["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+    // Check if image file is an actual image or fake image
+    if ($newProfileImage) {
+        $check = getimagesize($_FILES["CLERKIMAGE"]["tmp_name"]);
+        if ($check !== false) {
+            $uploadOk = 1;
+        } else {
+            echo "<script>alert('File is not an image.');</script>";
+            $uploadOk = 0;
+        }
+
+        // Check file size
+        if ($_FILES["CLERKIMAGE"]["size"] > 2000000) { // 2MB
+            echo "<script>alert('Sorry, your file is too large.');</script>";
+            $uploadOk = 0;
+        }
+
+        // Allow certain file formats
+        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+            echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');</script>";
+            $uploadOk = 0;
+        }
+    }
+
+    // Insert the new clerk data
+    $stmt = $dbCon->prepare("INSERT INTO clerk (CLERKID, CLERKNAME, CLERKPNO, CLERKEMAIL, CLERKDOB, CLERKPASSWORD, CLERKIMAGE, CLERKTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    if ($stmt === false) {
+        die("<script>alert('Error preparing SQL: " . $dbCon->error . "');</script>");
+    }
+    $clerkImageName = basename($_FILES["CLERKIMAGE"]["name"]);
+    $stmt->bind_param('isssssss', $newClerkId, $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $CLERKPASSWORD, $clerkImageName, $CLERKTYPE);
+    
+    if ($stmt->execute()) {
+        echo "<script>alert('New clerk record created successfully.');</script>";
+    } else {
+        echo "<script>alert('Error inserting record: " . $stmt->error . "');</script>";
+    }
+    
+    $stmt->close();
+    header("Location: listofclerk.php");
+    exit;
+}
+
+$dbCon->close();
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -413,16 +492,17 @@ input[type="submit"]:hover{
         </nav>
         <section class="section-1">
             <div class="modal-content">
-                <form action="updateadminprofile.php" method="POST">
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
                     <div class="edit-image">
                         <div class="container">
-                            <input type="file" id="file" accept="image/*" hidden>
                             <div class="img-area" data-img="">
                                 <i class='bx bxs-cloud-upload icon'></i>
                                 <h3>Upload Image</h3>
                                 <p>Image size must be less than <span>2MB</span></p>
                             </div>
-                            <button class="select-image">Select Image</button>
+                            <button class="select-image">Select Image
+                                <input type="file" id="CLERKIMAGE" name="CLERKIMAGE" accept="image/*" hidden>
+                            </button>
                         </div>
                     </div>
                     <table class="table1">
@@ -432,25 +512,25 @@ input[type="submit"]:hover{
                         <tr>
                             <td>
                                 Full Name <span style="color:red">*</span><br>
-                                <input type="text" name="" required>
+                                <input type="text" name="CLERKNAME" required>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 Phone Number <span style="color:red">*</span><br>
-                                <input type="text" name="" required>
+                                <input type="text" name="CLERKPNO" required>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 Date Of Birth <span style="color:red">*</span><br>
-                                <input type="date" name="" required>
+                                <input type="date" name="CLERKDOB" required>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 Email <span style="color:red">*</span><br>
-                                <input type="text" name="" required>
+                                <input type="text" name="CLERKEMAIL" required>
                             </td>
                         </tr>
                         <tr>
@@ -463,32 +543,32 @@ input[type="submit"]:hover{
     </div>
     <script>
         const selectImage = document.querySelector('.select-image');
-        const inputFile = document.querySelector('#file');
+        const inputFile = document.querySelector('#CLERKIMAGE'); // Updated to match the ID in the HTML
         const imgArea = document.querySelector('.img-area');
 
         selectImage.addEventListener('click', function () {
             inputFile.click();
-        })
+        });
 
         inputFile.addEventListener('change', function () {
-            const image = this.files[0]
+            const image = this.files[0];
             if(image.size < 2000000) {
                 const reader = new FileReader();
-                reader.onload = ()=> {
+                reader.onload = () => {
                     const allImg = imgArea.querySelectorAll('img');
-                    allImg.forEach(item=> item.remove());
+                    allImg.forEach(item => item.remove());
                     const imgUrl = reader.result;
                     const img = document.createElement('img');
                     img.src = imgUrl;
                     imgArea.appendChild(img);
                     imgArea.classList.add('active');
                     imgArea.dataset.img = image.name;
-                }
+                };
                 reader.readAsDataURL(image);
             } else {
                 alert("Image size more than 2MB");
             }
-        })
+        });
     </script>
 </body>
 </html>

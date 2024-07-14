@@ -1,18 +1,15 @@
 <?php
 require_once("../dbConnect.php");
 
-if (isset($_GET['clerkid'])) {
-    $clerkId = $_GET['clerkid'];
-    $sql = "SELECT * FROM clerk WHERE CLERKID = ?";
-    $stmt = $dbCon->prepare($sql);
-    $stmt->bind_param("i", $clerkId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $clerk = $result->fetch_assoc();
-    $stmt->close();
-} else {
-    $clerk = null;
-}
+$clerkId = $_GET['clerkid'];
+
+// Use a prepared statement to prevent SQL injection
+$stmt = $dbCon->prepare("SELECT * FROM clerk WHERE CLERKID = ?");
+$stmt->bind_param("i", $clerkId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$clerk = $result->fetch_assoc(); // Fetch single clerk row
 
 $dbCon->close();
 ?>
@@ -119,38 +116,21 @@ $dbCon->close();
     <div class="profile-container">
         <?php if ($clerk): ?>
             <div class="image-wrap">
-                <img src="<?php echo '../' . htmlspecialchars($clerk['CLERKIMAGE']); ?>" alt="Profile Picture">
+                <img src="<?php echo !empty($clerk['CLERKIMAGE']) ? '../CLERK/' . htmlspecialchars($clerk['CLERKIMAGE']) : '../default-profile.png'; ?>" alt="Profile Picture">
             </div>
             <h2><?php echo htmlspecialchars($clerk['CLERKNAME']); ?></h2>
+            <p><strong>ID:</strong> <?php echo htmlspecialchars($clerk['CLERKID']); ?></p>
             <p><strong>Email:</strong> <?php echo htmlspecialchars($clerk['CLERKEMAIL']); ?></p>
             <p><strong>Phone:</strong> <?php echo htmlspecialchars($clerk['CLERKPNO']); ?></p>
-            <p><strong>Date of Birth:</strong> <?php echo htmlspecialchars($clerk['CLERKDOB']); ?></p>
+            <p><strong>Date of Birth:</strong> <?php echo date('d F Y' ,strtotime($clerk['CLERKDOB'])); ?></p>
             <div class="icon-container">
-                <a href="editclerk.php?clerkid=<?php echo $clerkId; ?>"><i class="fa fa-pencil"></i></a>
+            <a href="editclerk.php?clerkid=<?php echo $clerk['CLERKID']; ?>"><i class="fa fa-pencil"></i></a>
                 <a href="deleteclerk.php?clerkid=<?php echo $clerkId; ?>" onclick="return confirm('Are you sure you want to delete this clerk?');"><i class="fa fa-trash"></i></a>
                 <a href="#" onclick="printProfile()"><i class="fa fa-print"></i></a>
             </div>
             <?php else: ?>
             <p>No profile details found for this clerk.</p>
         <?php endif; ?>
-    </div>
-    <div class="edit-container">
-        <h2>Edit Clerk</h2>
-        <form method="post" action="">
-            <label for="clerkname">Name</label>
-            <input type="text" id="clerkname" name="clerkname" value="<?php echo htmlspecialchars($clerk['CLERKNAME']); ?>" required>
-            
-            <label for="clerkemail">Email</label>
-            <input type="email" id="clerkemail" name="clerkemail" value="<?php echo htmlspecialchars($clerk['CLERKEMAIL']); ?>" required>
-            
-            <label for="clerkpno">Phone</label>
-            <input type="text" id="clerkpno" name="clerkpno" value="<?php echo htmlspecialchars($clerk['CLERKPNO']); ?>" required>
-            
-            <label for="clerkdob">Date of Birth</label>
-            <input type="date" id="clerkdob" name="clerkdob" value="<?php echo htmlspecialchars($clerk['CLERKDOB']); ?>" required>
-            
-            <button type="submit">Save Changes</button>
-        </form>
     </div>
     <script>
         function showEditForm() {

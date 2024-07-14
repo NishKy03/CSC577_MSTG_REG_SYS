@@ -36,8 +36,13 @@ if ($result->num_rows > 0) {
         // Assign the modified name back to the row
         $row['CLERKNAME'] = $firstTwoWords;
 
-        // Prepend '../' to the CLERKIMAGE path
-        $row['CLERKIMAGE'] = '../' . $row['CLERKIMAGE'];
+        // Prepend '../CLERK/' to the CLERKIMAGE path if not empty, else use default image
+        if (!empty($row['CLERKIMAGE'])) {
+            $row['CLERKIMAGE'] = '../CLERK/' . $row['CLERKIMAGE'];
+        } else {
+            $row['CLERKIMAGE'] = '../default-profile.png'; // Use your specific default image here
+        }
+
 
         // Store the modified row in the clerks array
         $clerks[] = $row;
@@ -339,7 +344,7 @@ $dbCon->close();
         }
         .pagination {
             display: flex;
-            justify-content: center;
+            justify-content: right;
             margin-top: 20px;
         }
         .pagination a {
@@ -349,6 +354,8 @@ $dbCon->close();
             color: black;
             border: 1px solid #ccc;
             border-radius: 5px;
+            background-color: #fff;
+            font-family: "Poppins", sans-serif;
         }
         .pagination a:hover {
             background-color: #ddd;
@@ -458,12 +465,12 @@ $dbCon->close();
                         echo '<td>';
                         echo '<div class="clerk-profile">';
                         echo '<div class="image-wrap">';
-                        echo '<img src="' . htmlspecialchars($clerk['CLERKIMAGE']) . '" alt="Profile Picture">';
+                        echo '<img src="' . (!empty($clerk['CLERKIMAGE']) ? htmlspecialchars($clerk['CLERKIMAGE']) : 'default-profile.png') . '" alt="Profile Picture">';
                         echo '</div>';
                         echo '<table>';
                         echo '<tr><th>' . htmlspecialchars($clerk['CLERKNAME']) . '</th></tr>';
                         echo '<tr><td><span style="color: grey;">' . htmlspecialchars($clerk['CLERKEMAIL']) . '</span></td></tr>';
-                        echo '<tr><td><a href="#" class="view-profile" data-id="' . htmlspecialchars($clerk['CLERKID']) . '">View Profile</a></td></tr>';
+                        echo '<tr><td><a href="#" class="view-profile" clerkid="' . htmlspecialchars($clerk['CLERKID']) . '">View Profile</a></td></tr>';
                         echo '</table>';
                         echo '</div>';
                         echo '</td>';
@@ -480,13 +487,13 @@ $dbCon->close();
                 </table>
                 <div class="pagination">
                     <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1; ?>">&laquo; Previous</a>
+                        <a href="?page=<?php echo $page - 1; ?>">&laquo;</a>
                     <?php endif; ?>
                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                         <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                     <?php endfor; ?>
                     <?php if ($page < $totalPages): ?>
-                        <a href="?page=<?php echo $page + 1; ?>">Next &raquo;</a>
+                        <a href="?page=<?php echo $page + 1; ?>">&raquo;</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -524,7 +531,7 @@ $dbCon->close();
         for (var i = 0; i < viewProfileLinks.length; i++) {
             viewProfileLinks[i].onclick = function(event) {
                 event.preventDefault();
-                var clerkId = this.getAttribute("data-id");
+                var clerkId = this.getAttribute("clerkid");
                 // Fetch profile details using AJAX
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "fetchProfileDetails.php?clerkid=" + clerkId, true);

@@ -10,20 +10,18 @@ if (isset($_GET['clerkid'])) {
     $result = $stmt->get_result();
     $clerk = $result->fetch_assoc();
     $stmt->close();
-} else {
-    echo "No clerk ID specified.";
-    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['clerkname'];
-    $email = $_POST['clerkemail'];
-    $phone = $_POST['clerkpno'];
-    $dob = $_POST['clerkdob'];
+    $clerkId = $_POST['CLERKID'];
+    $name = $_POST['CLERKNAME'];
+    $email = $_POST['CLERKEMAIL'];
+    $phone = $_POST['CLERKPNO'];
+    $dob = $_POST['CLERKDOB'];
 
     $sql = "UPDATE clerk SET CLERKNAME = ?, CLERKEMAIL = ?, CLERKPNO = ?, CLERKDOB = ? WHERE CLERKID = ?";
     $stmt = $dbCon->prepare($sql);
-    $stmt->bind_param("sssii", $name, $email, $phone, $dob, $clerkId);
+    $stmt->bind_param("ssssi", $name, $email, $phone, $dob, $clerkId);
 
     if ($stmt->execute()) {
         echo "Clerk details updated successfully.";
@@ -33,10 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt->close();
     $dbCon->close();
-    header("Location: clerkprofile.php?clerkid=$clerkId");
+    header("Location: listofclerk.php");
     exit;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -337,23 +336,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <section class="section-1">
             <div class="edit-clerk">
                 <div class="image-container">
-                <?php
-                    $imagePath = htmlspecialchars($clerk['CLERKIMAGE']);
-                    echo "<img src='../$imagePath' alt='Profile Image'>";
-                ?>
+                    <?php
+                        $imagePath = htmlspecialchars($clerk['CLERKIMAGE']);
+                        echo "<img src='../CLERK/$imagePath' alt='Profile Image'>";
+                    ?>
                 </div>
-                <form method="post" action="" class="form-class">
-                    <label for="clerkname">Name</label><br>
-                    <input type="text" id="clerkname" name="clerkname" value="<?php echo htmlspecialchars($clerk['CLERKNAME']); ?>" required><br>
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form-class">
+                    <input type="text" id="CLERKID" name="CLERKID" value="<?php echo htmlspecialchars($clerk['CLERKID']); ?>" hidden><br>
+                    <label for="CLERKNAME">Name</label><br>
+                    <input type="text" id="CLERKNAME" name="CLERKNAME" value="<?php echo htmlspecialchars($clerk['CLERKNAME']); ?>" required><br>
                     
-                    <label for="clerkemail">Email</label><br>
-                    <input type="text" id="clerkemail" name="clerkemail" value="<?php echo htmlspecialchars($clerk['CLERKEMAIL']); ?>" required><br>
+                    <label for="CLERKEMAIL">Email</label><br>
+                    <input type="text" id="CLERKEMAIL" name="CLERKEMAIL" value="<?php echo htmlspecialchars($clerk['CLERKEMAIL']); ?>" required><br>
                     
                     <label for="clerkpno">Phone</label><br>
-                    <input type="text" id="clerkpno" name="clerkpno" value="<?php echo htmlspecialchars($clerk['CLERKPNO']); ?>" required><br>
+                    <input type="text" id="CLERKPNO" name="CLERKPNO" value="<?php echo htmlspecialchars($clerk['CLERKPNO']); ?>" required><br>
                     
-                    <label for="clerkdob">Date of Birth</label><br>
-                    <input type="date" id="clerkdob" name="clerkdob" value="<?php echo htmlspecialchars($clerk['CLERKDOB']); ?>" required><br>
+                    <label for="CLERKDOB">Date of Birth</label><br>
+                    <input type="date" id="CLERKDOB" name="CLERKDOB" value="<?php echo htmlspecialchars($clerk['CLERKDOB']); ?>" required><br>
                     
                     <div class="submit-container">
                         <input type="submit" value="Save">
