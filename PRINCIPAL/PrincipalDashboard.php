@@ -56,6 +56,22 @@ while ($row = $resultGenderDistribution->fetch_assoc()) {
 }
 $stmtGenderDistribution->close();
 
+
+// Query to get number of student registrations per year
+$stmtRegistrationPerYear = $dbCon->prepare("
+    SELECT YEAR(regdate) as year, COUNT(*) as count 
+    FROM registration 
+    GROUP BY YEAR(regdate) 
+    ORDER BY YEAR(regdate)
+");
+$stmtRegistrationPerYear->execute();
+$resultRegistrationPerYear = $stmtRegistrationPerYear->get_result();
+$registrationData = [];
+while ($row = $resultRegistrationPerYear->fetch_assoc()) {
+    $registrationData[] = $row;
+}
+$stmtRegistrationPerYear->close();
+
 $dbCon->close();
 ?>
 
@@ -400,11 +416,18 @@ body.dark .home .text{
     margin-bottom: 20px;
 }
 
+.content-in .content-in-pie {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
 .show-box1,
 .show-box2,
 .show-box3,
 .show-box4, 
-.show-box5 {
+.show-box5,
+.show-box6  {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: white;
     width: 300px;
@@ -418,7 +441,8 @@ body.dark .home .text{
 .icon-class2,
 .icon-class3,
 .icon-class4,
-.icon-class5 {
+.icon-class5,
+.icon-class6{
     position: absolute;
     width: 60px;
     height: 60px;
@@ -451,6 +475,11 @@ body.dark .home .text{
 .icon-class5 {
     background: #ffea18;
 }
+
+.icon-class6 {
+    background: #ffea31;
+}
+
 
 .content-in-pie {
     display: flex;
@@ -509,61 +538,83 @@ body.dark .home .text{
     </nav>
 
     <section class="home">
-    <div class="dashboard-wrapper">Dashboard</div>
-    <div class="content-in"> 
-        <div class="content-in-row">
-            <div class="show-box1">
-                <h3>Total Clerk</h3>
-                <div class="icon-class1">
-                    <span><i class="fa fa-users" aria-hidden="true"></i></span>
+        <div class="dashboard-wrapper">Dashboard</div>
+        <div class="content-in">
+            <div class="content-in-row">
+                <div class="show-box1">
+                    <h3>Total Clerk</h3>
+                    <div class="icon-class1">
+                        <span><i class="fa fa-users" aria-hidden="true"></i></span>
+                    </div>
+                    <p><b id="totalClerks"></b></p>
                 </div>
-                <p><b><?php echo $totalClerks; ?></b></p>
+                <div class="show-box2">
+                    <h3>Total Student</h3>
+                    <div class="icon-class2">
+                        <span><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
+                    </div>
+                    <p><b id="totalStudents"></b></p>
+                </div>
+                <div class="show-box3">
+                    <h3>Total Approved</h3>
+                    <div class="icon-class3">
+                        <span><i class="fas fa-calendar-check"></i></span>
+                    </div>
+                    <p><b id="totalApproved"></b></p>
+                </div>
+                <div class="show-box4">
+                    <h3>Total Unapproved</h3>
+                    <div class="icon-class4">
+                        <span><i class="fa fa-spinner" aria-hidden="true"></i></span>
+                    </div>
+                    <p><b id="totalUnapproved"></b></p>
+                </div>
             </div>
-            <div class="show-box2">
-                <h3>Total Student</h3>
-                <div class="icon-class2">
-                    <span><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
+            <div class="content-in-pie">
+                <div class="show-box5">
+                    <h3>Student Gender</h3>
+                    <canvas id="genderPieChart" width="400" height="400"></canvas>
                 </div>
-                <p><b><?php echo $totalStudents; ?></b></p>
-            </div>
-            <div class="show-box3">
-                <h3>Total Approved</h3>
-                <div class="icon-class3">
-                    <span><i class="fas fa-calendar-check"></i></span>
+                <div class="show-box6">
+                    <h3>Registration</h3>
+                    <canvas id="registrationChart" width="400" height="400"></canvas>
                 </div>
-                <p><b><?php echo $totalApproved; ?></b></p>
-            </div>
-            <div class="show-box4">
-                <h3>Total Unapproved</h3>
-                <div class="icon-class4">
-                    <span><i class="fa fa-spinner" aria-hidden="true"></i></span>
-                </div>
-                <p><b><?php echo $totalUnapproved; ?></b></p>
             </div>
         </div>
-        <div class="content-in-pie">
-            <div class="show-box5">
-                <h3>Student Gender</h3>
-                <canvas id="genderPieChart" width="400" height="400"></canvas>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // PHP data embedded into JavaScript
-            const data = <?php echo json_encode($genderData); ?>;
-            const labels = data.map(item => item.gender);
-            const counts = data.map(item => item.count);
+            // Replace these variables with your actual data
+            const totalClerks = 10;
+            const totalStudents = 100;
+            const totalApproved = 60;
+            const totalUnapproved = 40;
+            const genderData = [
+                { gender: "Male", count: 70 },
+                { gender: "Female", count: 30 }
+            ];
+            const registrationData = [
+                { year: 2021, count: 20 },
+                { year: 2022, count: 30 },
+                { year: 2023, count: 50 }
+            ];
 
-            const ctx = document.getElementById('genderPieChart').getContext('2d');
-            new Chart(ctx, {
+            document.getElementById("totalClerks").textContent = totalClerks;
+            document.getElementById("totalStudents").textContent = totalStudents;
+            document.getElementById("totalApproved").textContent = totalApproved;
+            document.getElementById("totalUnapproved").textContent = totalUnapproved;
+
+            const genderLabels = genderData.map(item => item.gender);
+            const genderCounts = genderData.map(item => item.count);
+
+            const genderCtx = document.getElementById('genderPieChart').getContext('2d');
+            new Chart(genderCtx, {
                 type: 'pie',
                 data: {
-                    labels: labels,
+                    labels: genderLabels,
                     datasets: [{
-                        data: counts,
+                        data: genderCounts,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)'
@@ -588,33 +639,42 @@ body.dark .home .text{
                     }
                 },
             });
-        });
 
-        const body = document.querySelector('body'),
-        sidebar = body.querySelector('nav'),
-        toggle = body.querySelector(".toggle"),
-        searchBtn = body.querySelector(".search-box"),
-        modeSwitch = body.querySelector(".toggle-switch"),
-        modeText = body.querySelector(".mode-text");
+            const registrationLabels = registrationData.map(item => item.year);
+            const registrationCounts = registrationData.map(item => item.count);
 
-        toggle.addEventListener("click" , () =>{
-            sidebar.classList.toggle("close");
-        });
-
-        searchBtn.addEventListener("click" , () =>{
-            sidebar.classList.remove("close");
-        });
-
-        modeSwitch.addEventListener("click" , () =>{
-            body.classList.toggle("dark");
-            
-            if(body.classList.contains("dark")){
-                modeText.innerText = "Light mode";
-            }else{
-                modeText.innerText = "Dark mode";
-            }
+            const registrationCtx = document.getElementById('registrationChart').getContext('2d');
+            new Chart(registrationCtx, {
+                type: 'bar',
+                data: {
+                    labels: registrationLabels,
+                    datasets: [{
+                        label: 'Number of Students Registered per Year',
+                        data: registrationCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Student Registrations Over the Years'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                },
+            });
         });
     </script>
-
 </body>
 </html>
