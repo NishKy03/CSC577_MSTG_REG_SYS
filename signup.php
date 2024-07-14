@@ -30,12 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert the new student into the database
-        $sql = "INSERT INTO STUDENT (STUID, STUNAME, STUPNO, STUEMAIL, STUPASSWORD, STATUS) VALUES (?, ?, ?, ?, ?, 'Pending')";
+        $sql = "INSERT INTO STUDENT (STUID, STUNAME, STUPNO, STUEMAIL, STUPASSWORD) VALUES (?, ?, ?, ?, ?)";
         $stmt = $dbCon->prepare($sql);
         $stmt->bind_param('sssss', $newID, $STUNAME, $STUPNO, $STUEMAIL, $STUPASSWORD);
 
         if ($stmt->execute()) {
-            echo "<script>alert('Successfully registered. Your student ID is " . $newID . ". You can continue to login.'); window.location.href='login.php';</script>";
+            $sql2 = "INSERT INTO REGISTRATION (STUID, STATUS, REGDATE) VALUES (?, 'Pending', NOW())";
+            $stmt2 = $dbCon->prepare($sql2);
+            $stmt2->bind_param('s', $newID);
+
+            if ($stmt2->execute()) {
+                echo "<script>
+                alert('Successfully registered. Your student ID is " . $newID . ". You can continue to login.');
+                window.location.href = 'login.php';</script>";
+            } else {
+                echo "<script>alert('Error: " . $stmt2->error . "');</script>";
+            }
         } else {
             echo "<script>alert('Error: " . $stmt->error . "');</script>";
         }
