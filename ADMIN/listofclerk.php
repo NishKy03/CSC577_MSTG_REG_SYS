@@ -14,15 +14,25 @@ $itemsPerPage = 9; // 3 rows * 3 columns
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $itemsPerPage;
 
+// Handle search query
+$search = isset($_GET['search']) ? $dbCon->real_escape_string($_GET['search']) : '';
+
 // Count total clerks
 $sql = "SELECT COUNT(*) AS total FROM clerk WHERE CLERKTYPE='clerk'";
+if ($search) {
+    $sql .= " AND (CLERKNAME LIKE '%$search%' OR CLERKEMAIL LIKE '%$search%')";
+}
 $result = $dbCon->query($sql);
 $row = $result->fetch_assoc();
 $totalClerks = $row['total'];
 $totalPages = ceil($totalClerks / $itemsPerPage);
 
 // Fetch clerks for the current page
-$sql = "SELECT * FROM clerk WHERE CLERKTYPE='clerk' LIMIT $itemsPerPage OFFSET $offset";
+$sql = "SELECT * FROM clerk WHERE CLERKTYPE='clerk'";
+if ($search) {
+    $sql .= " AND (CLERKNAME LIKE '%$search%' OR CLERKEMAIL LIKE '%$search%')";
+}
+$sql .= " LIMIT $itemsPerPage OFFSET $offset";
 $result = $dbCon->query($sql);
 
 $clerks = array();
@@ -43,10 +53,14 @@ if ($result->num_rows > 0) {
             $row['CLERKIMAGE'] = '../default-profile.png'; // Use your specific default image here
         }
 
-
         // Store the modified row in the clerks array
         $clerks[] = $row;
     }
+}
+
+if (isset($_GET['message'])) {
+    $message = htmlspecialchars($_GET['message']);
+    echo "<script type='text/javascript'>alert('$message');</script>";
 }
 
 $dbCon->close();
@@ -446,14 +460,15 @@ $dbCon->close();
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Clerk</p>
             </div>
             <div class="line1">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search here">
-                    <button type="submit"><i class="fa fa-search"></i></button>
-                </div>
-                <div class="add-clerk">
-                    <a href="addclerk.php"><i class="fa fa-user-plus" aria-hidden="true"></i>Add Clerk</a>
-                </div>
-            </div>
+    <form class="search-bar" method="GET" action="">
+        <input type="text" name="search" placeholder="Search here" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+    <div class="add-clerk">
+        <a href="addclerk.php"><i class="fa fa-user-plus" aria-hidden="true"></i>Add Clerk</a>
+    </div>
+</div>
+
             <div class="list-clerk">
                 <table>
                     <?php
