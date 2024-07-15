@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $STUNAME_err = "Please enter your full name.";
     } else {
         $STUNAME = trim($_POST["STUNAME"]);
-        if (!preg_match("/^[a-zA-Z-' ]*$/", $STUNAME)) {
+        if (!preg_match("/^[A-Za-z\s@'.\/]{1,255}$/", $STUNAME)) {
             $STUNAME_err = "Only letters and white space allowed";
         }
     }
