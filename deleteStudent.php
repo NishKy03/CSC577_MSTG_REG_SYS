@@ -24,17 +24,19 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
             if ($stmt2->execute()) {
                 return true; // Deletion successful
+               
             } else {
                 return false; // Deletion failed
             }
+             $stmt2->close();
         } else {
             echo "Error: The student record could not be deleted because it has references in Registration table.";
             return false; // Deletion failed
         }
-       
+        $stmt->close();
     }
-    $stmt2->close();
-    $stmt->close();
+    
+   
     // Call deleteStudent function
     if (deleteStudent($dbCon, $studentId)) {
         // Successful deletion
