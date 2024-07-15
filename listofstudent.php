@@ -21,8 +21,26 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
-$sql = "SELECT s.STUID, s.STUNAME, s.STUEMAIL, r.STATUS, r.CLERKID FROM student as s JOIN registration as r ON s.STUID = r.STUID";
-$result = $dbCon->query($sql);
+// Pagination setup
+$limit = 10; // Number of entries per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$start = ($page - 1) * $limit;
+
+// Get the total number of students
+$sql = "SELECT COUNT(*) FROM student";
+$stmt = $dbCon->prepare($sql);
+$stmt->execute();
+$stmt->bind_result($total);
+$stmt->fetch();
+$stmt->close();
+
+$total_pages = ceil($total / $limit);
+
+$sql = "SELECT s.STUID, s.STUNAME, s.STUEMAIL, r.STATUS, r.CLERKID FROM student as s JOIN registration as r ON s.STUID = r.STUID LIMIT ?, ?";
+$stmt = $dbCon->prepare($sql);
+$stmt->bind_param("ii", $start, $limit);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $studentId = $_POST['id'];
@@ -296,6 +314,24 @@ select:focus {
 #updateSttsbtn:hover {
     background-color: #48332E;
 }
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -344,7 +380,6 @@ select:focus {
         </nav>
         <section class="section-1">
             <div class="circled-menu-parent">
-                
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Student</p>
                 <a href="printStudentList.php" id="printbtn" style="text-decoration: none; color: #000; text-align: end;">Print<i class="fa fa-print" style="font-size:25px;"></i></a>
             </div>
@@ -359,7 +394,7 @@ select:focus {
                 </tr>
                 <?php
                 if ($result->num_rows > 0) {
-                    $count = 1;
+                    $count = $start + 1;
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td style='text-align: center'>" . $count++ . "</td>";
@@ -390,6 +425,19 @@ select:focus {
                 }
                 ?>
             </table>
+            <div class="pagination">
+                <?php
+                if ($page > 1) {
+                    echo '<a href="?page=' . ($page - 1) . '">Previous</a>';
+                }
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    echo '<a href="?page=' . $i . '">' . $i . '</a>';
+                }
+                if ($page < $total_pages) {
+                    echo '<a href="?page=' . ($page + 1) . '">Next</a>';
+                }
+                ?>
+            </div>
         </section>
     </div>
 
