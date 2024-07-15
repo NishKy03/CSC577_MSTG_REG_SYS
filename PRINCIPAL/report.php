@@ -1,7 +1,6 @@
 <?php
 require_once("../dbConnect.php");
 
-
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -9,14 +8,34 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Prepare and execute the SQL statement to get student data
-$stmtStudent = $dbCon->prepare("SELECT stuid, stuname, studob, stugender, stuaddress FROM student");
+// Determine the current page and the offset for the SQL query
+$itemsPerPage = 5;
+$currentStudentPage = isset($_GET['student_page']) ? (int)$_GET['student_page'] : 1;
+$currentClerkPage = isset($_GET['clerk_page']) ? (int)$_GET['clerk_page'] : 1;
+
+$studentOffset = ($currentStudentPage - 1) * $itemsPerPage;
+$clerkOffset = ($currentClerkPage - 1) * $itemsPerPage;
+
+// Get total number of students
+$totalStudentsQuery = $dbCon->query("SELECT COUNT(*) FROM student");
+$totalStudents = $totalStudentsQuery->fetch_row()[0];
+$totalStudentPages = ceil($totalStudents / $itemsPerPage);
+
+// Get total number of clerks
+$totalClerksQuery = $dbCon->query("SELECT COUNT(*) FROM clerk");
+$totalClerks = $totalClerksQuery->fetch_row()[0];
+$totalClerkPages = ceil($totalClerks / $itemsPerPage);
+
+// Prepare and execute the SQL statement to get student data with limit and offset
+$stmtStudent = $dbCon->prepare("SELECT stuid, stuname, studob, stugender, stuaddress FROM student LIMIT ? OFFSET ?");
+$stmtStudent->bind_param("ii", $itemsPerPage, $studentOffset);
 $stmtStudent->execute();
 $stmtStudent->store_result();
 $stmtStudent->bind_result($studentId, $studentName, $studentDob, $studentGender, $studentAddress);
 
-// Prepare and execute the SQL statement to get clerk data
-$stmtClerk = $dbCon->prepare("SELECT clerkid, clerkname, clerktype, clerkemail FROM clerk");
+// Prepare and execute the SQL statement to get clerk data with limit and offset
+$stmtClerk = $dbCon->prepare("SELECT clerkid, clerkname, clerktype, clerkemail FROM clerk LIMIT ? OFFSET ?");
+$stmtClerk->bind_param("ii", $itemsPerPage, $clerkOffset);
 $stmtClerk->execute();
 $stmtClerk->store_result();
 $stmtClerk->bind_result($clerkid, $clerkname, $department, $contact);
@@ -25,13 +44,8 @@ function calculateAge($dob) {
     $dob = new DateTime($dob);
     $now = new DateTime();
     $age = $now->diff($dob);
-    return $age->y; }  
-
-
-
-
-
-
+    return $age->y;
+}
 ?>
 
 <!DOCTYPE html>
@@ -385,7 +399,7 @@ table, th, td {
 
 th, td {
     padding: 12px;
-    text-align: left;
+    text-align: center;
 }
 
 th {
@@ -395,6 +409,36 @@ th {
 
 tbody tr:nth-child(odd) {
     background-color: #f2f2f2;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination .active a {
+    background-color: #007bff;
+    color: #fff;
+    cursor: default;
 }
 </style>
 <body>
@@ -460,9 +504,9 @@ tbody tr:nth-child(odd) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($studentId) . "</td>";
                             echo "<td>" . htmlspecialchars($studentName) . "</td>";
-                            echo "<td>" . (isset($studentDob) ? calculateAge($studentDob) : 'Unknown') . "</td>";
-                            echo "<td>" . htmlspecialchars($studentGender) . "</td>";
-                            echo "<td>" . htmlspecialchars($studentAddress) . "</td>";
+                            echo "<td>" . (isset($studentDob) ? calculateAge($studentDob) : '-') . "</td>";
+                            echo "<td>" . (isset($studentGender) ? htmlspecialchars($studentGender) : '-') . "</td>";
+                            echo "<td>" . (isset($studentAddress) ? htmlspecialchars($studentAddress) : '-') . "</td>";
                             echo "</tr>";
                         }
                     } else {
@@ -472,6 +516,21 @@ tbody tr:nth-child(odd) {
                     ?>
                 </tbody>
             </table>
+            <div>
+                <?php if ($totalStudentPages > 1): ?>
+                    <ul class="pagination">
+                        <?php if ($currentStudentPage > 1): ?>
+                            <li><a href="?student_page=<?php echo $currentStudentPage - 1; ?>&clerk_page=<?php echo $currentClerkPage; ?>">&laquo;</a></li>
+                        <?php endif; ?>
+                        <?php for ($i = 1; $i <= $totalStudentPages; $i++): ?>
+                            <li><a href="?student_page=<?php echo $i; ?>&clerk_page=<?php echo $currentClerkPage; ?>"><?php echo $i; ?></a></li>
+                        <?php endfor; ?>
+                        <?php if ($currentStudentPage < $totalStudentPages): ?>
+                            <li><a href="?student_page=<?php echo $currentStudentPage + 1; ?>&clerk_page=<?php echo $currentClerkPage; ?>">&raquo;</a></li>
+                        <?php endif; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
 
             <h2>Clerk List</h2>
             <table>
@@ -502,6 +561,21 @@ tbody tr:nth-child(odd) {
                     ?>
                 </tbody>
             </table>
+            <div>
+                <?php if ($totalClerkPages > 1): ?>
+                    <ul class="pagination">
+                        <?php if ($currentClerkPage > 1): ?>
+                            <li><a href="?student_page=<?php echo $currentStudentPage; ?>&clerk_page=<?php echo $currentClerkPage - 1; ?>">&laquo;</a></li>
+                        <?php endif; ?>
+                        <?php for ($i = 1; $i <= $totalClerkPages; $i++): ?>
+                            <li><a href="?student_page=<?php echo $currentStudentPage; ?>&clerk_page=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                        <?php endfor; ?>
+                        <?php if ($currentClerkPage < $totalClerkPages): ?>
+                            <li><a href="?student_page=<?php echo $currentStudentPage; ?>&clerk_page=<?php echo $currentClerkPage + 1; ?>">&raquo;</a></li>
+                        <?php endif; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
         </div>
     </section>
 
