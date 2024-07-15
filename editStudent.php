@@ -372,7 +372,7 @@ input[type="submit"]:hover
         </label>
         <h2 class="welcome-name">Welcome <span style="color: #48332E;"><?php echo htmlspecialchars($firstName); ?></span> !</h2>
         <div class="right-icon">
-            <a href="studentprofile.php">
+            <a href="ClerkProfile.php">
                 <i class="fa fa-user" aria-hidden="true"></i>
             </a>
         </div>
