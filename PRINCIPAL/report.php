@@ -31,7 +31,7 @@ $stmtStudent = $dbCon->prepare("SELECT s.stuid, s.stuname, s.studob, s.stugender
 $stmtStudent->bind_param("ii", $itemsPerPage, $studentOffset);
 $stmtStudent->execute();
 $stmtStudent->store_result();
-$stmtStudent->bind_result($studentId, $studentName, $studentDob, $studentGender, $studentAddress);
+$stmtStudent->bind_result($studentId, $studentName, $studentDob, $studentGender, $studentAddress,$status);
 
 // Prepare and execute the SQL statement to get clerk data with limit and offset
 $stmtClerk = $dbCon->prepare("SELECT clerkid, clerkname, clerktype, clerkemail FROM clerk LIMIT ? OFFSET ?");
