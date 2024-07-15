@@ -159,7 +159,9 @@
             <tr class="details">
                 <td class="topbotright-b">Student ID: </td>
                 <td ><?php echo $stuID;?></td>
-                <td class="all-c" rowspan="6" style="text-align: center; padding-left:10px; padding-left:10px; padding-right:10px;"><img class="profileImage" src="image/danishpic.png" alt=""></td>
+                <td class="all-c" rowspan="6" style="text-align: center; padding-left:10px; padding-left:10px; padding-right:10px;"><img class="profileImage" src="<?php echo !empty($stuImage) ? 'STUDENT/' . htmlspecialchars($stuImage) : 'default-profile.png'; ?>" alt="Profile Picture"></td>
+                
+                
             </tr>
             
             <tr class="details">
