@@ -13,13 +13,22 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
     // Function to delete student record
     function deleteStudent($dbCon, $studentId) {
-        $sql = "DELETE FROM student WHERE STUID = ?";
+        $sql = "DELETE FROM registration WHERE STUID = ?";
         $stmt = $dbCon->prepare($sql);
         $stmt->bind_param("s", $studentId);
         
         if ($stmt->execute()) {
-            return true; // Deletion successful
+            $sql2 = "DELETE FROM student WHERE STUID = ?";
+            $stmt2 = $dbCon->prepare($sql2);
+            $stmt2->bind_param("s", $studentId);
+
+            if ($stmt2->execute()) {
+                return true; // Deletion successful
+            } else {
+                return false; // Deletion failed
+            }
         } else {
+            echo "Error: The student record could not be deleted because it has references in Registration table.";
             return false; // Deletion failed
         }
         
