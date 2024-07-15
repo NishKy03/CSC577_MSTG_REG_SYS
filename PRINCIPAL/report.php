@@ -27,7 +27,7 @@ $totalClerks = $totalClerksQuery->fetch_row()[0];
 $totalClerkPages = ceil($totalClerks / $itemsPerPage);
 
 // Prepare and execute the SQL statement to get student data with limit and offset
-$stmtStudent = $dbCon->prepare("SELECT s.stuid, s.stuname, s.studob, s.stugender, s.stuaddress, r.status FROM student as s JOIN registration r WHERE r.status = 'Approved' LIMIT ? OFFSET ?");
+$stmtStudent = $dbCon->prepare("SELECT s.stuid, s.stuname, s.studob, s.stugender, s.stuaddress, r.status FROM student as s JOIN registration r ON s.stuid = r.stuid WHERE r.status = 'Approved' LIMIT ? OFFSET ?");
 $stmtStudent->bind_param("ii", $itemsPerPage, $studentOffset);
 $stmtStudent->execute();
 $stmtStudent->store_result();
