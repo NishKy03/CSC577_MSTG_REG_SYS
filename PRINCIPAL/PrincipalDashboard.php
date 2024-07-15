@@ -546,28 +546,28 @@ body.dark .home .text{
                     <div class="icon-class1">
                         <span><i class="fa fa-users" aria-hidden="true"></i></span>
                     </div>
-                    <p><b id="totalClerks"></b></p>
+                    <p><b><?php echo $totalClerks; ?></b></p>
                 </div>
                 <div class="show-box2">
                     <h3>Total Student</h3>
                     <div class="icon-class2">
                         <span><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
                     </div>
-                    <p><b id="totalStudents"></b></p>
+                    <p><b><?php echo $totalStudents; ?></b></p>
                 </div>
                 <div class="show-box3">
                     <h3>Total Approved</h3>
                     <div class="icon-class3">
                         <span><i class="fas fa-calendar-check"></i></span>
                     </div>
-                    <p><b id="totalApproved"></b></p>
+                    <p><b><?php echo $totalApproved; ?></b></p>
                 </div>
                 <div class="show-box4">
                     <h3>Total Unapproved</h3>
                     <div class="icon-class4">
                         <span><i class="fa fa-spinner" aria-hidden="true"></i></span>
                     </div>
-                    <p><b id="totalUnapproved"></b></p>
+                    <p><b><?php echo $totalUnapproved; ?></b></p>
                 </div>
             </div>
             <div class="content-in-pie">
@@ -586,24 +586,8 @@ body.dark .home .text{
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Replace these variables with your actual data
-            const totalClerks = 10;
-            const totalStudents = 100;
-            const totalApproved = 60;
-            const totalUnapproved = 40;
-            const genderData = [
-                { gender: "Male", count: 70 },
-                { gender: "Female", count: 30 }
-            ];
-            const registrationData = [
-                { year: 2021, count: 20 },
-                { year: 2022, count: 30 },
-                { year: 2023, count: 50 }
-            ];
-
-            document.getElementById("totalClerks").textContent = totalClerks;
-            document.getElementById("totalStudents").textContent = totalStudents;
-            document.getElementById("totalApproved").textContent = totalApproved;
-            document.getElementById("totalUnapproved").textContent = totalUnapproved;
+            const genderData = <?php echo json_encode($genderData); ?>;
+            const registrationData = <?php echo json_encode($registrationData); ?>;
 
             const genderLabels = genderData.map(item => item.gender);
             const genderCounts = genderData.map(item => item.count);
