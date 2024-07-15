@@ -10,11 +10,49 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $username = $_SESSION['username'];
 
+$CLERKNAME = $CLERKEMAIL = $CLERKPNO = $CLERKDOB = $CLERKPASSWORD = $CLERKTYPE = "";
+$CLERKNAME_err = $CLERKEMAIL_err = $CLERKPNO_err = $CLERKDOB_err = "";
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $CLERKNAME = $_POST['CLERKNAME'];
-    $CLERKDOB = $_POST['CLERKDOB'];
-    $CLERKPNO = $_POST['CLERKPNO'] ;
-    $CLERKEMAIL = $_POST['CLERKEMAIL'] ;
+     // Validate the clerk name
+     if (empty(trim($_POST["CLERKNAME"]))) {
+        $CLERKNAME_err = "Please enter your full name.";
+    } else {
+        $CLERKNAME = trim($_POST["CLERKNAME"]);
+        if (!preg_match("/^[A-Za-z\s@'.\/]{1,255}$/", $CLERKNAME)) {
+            $CLERKNAME_err = "Only letters, white space and symbols[@, ., /] allowed.";
+        }
+    }
+    // Validate the clerk email
+    if (empty(trim($_POST["CLERKEMAIL"]))) {
+        $CLERKEMAIL_err = "Please enter your email.";
+    } else {
+        $CLERKEMAIL = trim($_POST["CLERKEMAIL"]);
+        if (!filter_var($CLERKEMAIL, FILTER_VALIDATE_EMAIL)) {
+            $CLERKEMAIL_err = "Invalid email format.";
+        }
+    }
+    // Validate the clerk phone number
+    if (empty(trim($_POST["CLERKPNO"]))) {
+        $CLERKPNO_err = "Please enter your phone number.";
+    } else {
+        $CLERKPNO = trim($_POST["CLERKPNO"]);
+        if (!preg_match("/^\d{3}-\d{7}$/", $CLERKPNO) && !preg_match("/^\d{3}-\d{6}$/", $CLERKPNO)) {
+            $CLERKPNO_err = "Phone Number must be in format 'XXX-XXXXXXX' or 'XXX-XXXXXX'";
+        }
+    }
+    // Validate the clerk date of birth
+    if (empty(trim($_POST["CLERKDOB"]))) {
+        $CLERKDOB_err = "Please enter your date of birth.";
+    } else {
+        $CLERKDOB = trim($_POST["CLERKDOB"]);
+
+        // Check if the date is in the past
+        if (strtotime($CLERKDOB) > time()) {
+            $CLERKDOB_err = "Date of birth cannot be in the future.";
+        }
+    }
+
     $CLERKPASSWORD = '123'; 
     $CLERKTYPE = 'clerk'; 
     $newProfileImage = $_FILES['CLERKIMAGE']['name'];
@@ -56,22 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Insert the new clerk data
-    $stmt = $dbCon->prepare("INSERT INTO clerk (CLERKID, CLERKNAME, CLERKPNO, CLERKEMAIL, CLERKDOB, CLERKPASSWORD, CLERKIMAGE, CLERKTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    if ($stmt === false) {
-        die("<script>alert('Error preparing SQL: " . $dbCon->error . "');</script>");
+    if(empty($CLERKNAME_err) && empty($CLERKEMAIL_err) && empty($CLERKPNO_err) && empty($CLERKDOB_err)) {
+        $stmt = $dbCon->prepare("INSERT INTO clerk (CLERKID, CLERKNAME, CLERKPNO, CLERKEMAIL, CLERKDOB, CLERKPASSWORD, CLERKIMAGE, CLERKTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt === false) {
+            die("<script>alert('Error preparing SQL: " . $dbCon->error . "');</script>");
+        }
+        $stmt->bind_param('isssssss', $newClerkId, $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $CLERKPASSWORD, $newProfileImage, $CLERKTYPE);
+        
+        if ($stmt->execute()) {
+            echo "<script>alert('New clerk record created successfully.'); window.location.href='listofclerk.php';</script>";
+        } else {
+            echo "<script>alert('Error inserting record: " . $stmt->error . "');</script>";
+        }
+        
+        $stmt->close();
+        
+        exit;
     }
-    $clerkImageName = basename($_FILES["CLERKIMAGE"]["name"]);
-    $stmt->bind_param('isssssss', $newClerkId, $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $CLERKPASSWORD, $clerkImageName, $CLERKTYPE);
-    
-    if ($stmt->execute()) {
-        echo "<script>alert('New clerk record created successfully.');</script>";
-    } else {
-        echo "<script>alert('Error inserting record: " . $stmt->error . "');</script>";
-    }
-    
-    $stmt->close();
-    header("Location: listofclerk.php");
-    exit;
 }
 
 $dbCon->close();
@@ -353,6 +392,11 @@ input[type="submit"]:hover{
     background-color: #ff1a1a; /* Darker red for hover effect */
     color: #fff;
 }
+.error{
+    color: red;
+    font-size: 15px;
+    font-family: "Poppins", sans-serif;
+}
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -512,25 +556,29 @@ input[type="submit"]:hover{
                         <tr>
                             <td>
                                 Full Name <span style="color:red">*</span><br>
-                                <input type="text" name="CLERKNAME" required>
+                                <input type="text" name="CLERKNAME" value="<?= isset($CLERKNAME) ? $CLERKNAME : ''?>" required>
+                                <span id="ClerkNameError" class="error"><?php echo $CLERKNAME_err;?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 Phone Number <span style="color:red">*</span><br>
-                                <input type="text" name="CLERKPNO" required>
+                                <input type="text" name="CLERKPNO" value="<?= isset($CLERKPNO) ? $CLERKPNO : ''?>" required>
+                                <span id="ClerkPNOError" class="error"><?php echo $CLERKPNO_err;?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 Date Of Birth <span style="color:red">*</span><br>
-                                <input type="date" name="CLERKDOB" required>
+                                <input type="date" name="CLERKDOB" value="<?= isset($CLERKDOB) ? $CLERKDOB : ''?>" required>
+                                <span id="ClerkDOBError" class="error"><?php echo $CLERKDOB_err;?></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 Email <span style="color:red">*</span><br>
-                                <input type="text" name="CLERKEMAIL" required>
+                                <input type="text" name="CLERKEMAIL" value="<?= isset($CLERKEMAIL) ? $CLERKEMAIL : ''?>" required>
+                                <span id="ClerkEmailError" class="error"><?php echo $CLERKEMAIL_err;?></span>
                             </td>
                         </tr>
                         <tr>
