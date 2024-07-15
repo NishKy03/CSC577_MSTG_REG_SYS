@@ -146,7 +146,7 @@
     <div class="section">
         <table>
             <tr>
-                <td class="all-b" colspan="2"><h2>Alhamdulillah Wa Syukurilah </h2></td>
+                <td class="all-b" colspan="2"><h2>“MELAHIRKAN PELAJAR YANG BERPRESTASI TINGGI DAN<br> MAMPU MEMIMPIN UMMAH BERDASARKAN AL-QURAN DAN AS-SUNNAH”</h2></td>
                 <td class="all-bc"><img class="logo" src="logo.png"><br><p id="ref">58, Jalan Maktab, Taman Orkid, <br>16100 Kota Bharu, Kelantan</p>
                 <p id="ref">09-773 7300</p></td>
             </tr>
