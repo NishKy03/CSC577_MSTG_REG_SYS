@@ -38,7 +38,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
         $CLERKPHONENO_err = "Please enter your phone number.";
     } else{
         $CLERKPHONENO = trim($_POST['CLERKPHONENO']);
-        if(!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $STUPNO)){
+        if(!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $CLERKPHONENO)){
             $CLERKPHONENO_err = "Phone Number must be in format 'XXX-XXXXXXXX' or 'XXX-XXXXXXX'";
         }
     }
@@ -46,7 +46,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
         $CLERKEMAIL_err = "Please enter your email.";
     } else{
         $CLERKEMAIL = trim($_POST['CLERKEMAIL']);
-        if(!filter_var($STUEMAIL, FILTER_VALIDATE_EMAIL)){
+        if(!filter_var($CLERKEMAIL, FILTER_VALIDATE_EMAIL)){
             $CLERKEMAIL_err = "Invalid email format.";
         }
     }
@@ -112,7 +112,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
                     echo "Error updating database: " . $stmt->error;
                 }
                 $stmt->close();
-                // No need to set $STUIMAGE here as it is not used further in the code
+                // No need to set $CLERKIMAGE here as it is not used further in the code
             } else {
                 echo "Sorry, there was an error uploading your file.";
             }
@@ -126,14 +126,14 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
         if ($updateStmt === false) {
             die("Prepare failed: " . $dbCon->error);
         }
-        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, basename($_FILES["CLERKIMAGE"]["name"]), $username);
+        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPHONENO, $CLERKEMAIL, $CLERKDOB, basename($_FILES["CLERKIMAGE"]["name"]), $username);
     } else {
         // Update user data without changing profile image
         $updateStmt = $dbCon->prepare("UPDATE CLERK SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ? WHERE CLERKID = ?");
         if ($updateStmt === false) {
             die("Prepare failed: " . $dbCon->error);
         }
-        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $username);
+        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPHONE, $CLERKEMAIL, $CLERKDOB, $username);
     }
 
     if (!$updateStmt->execute()) {
