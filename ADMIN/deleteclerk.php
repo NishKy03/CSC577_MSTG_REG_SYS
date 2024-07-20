@@ -10,7 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $clerkId = $_GET['clerkid'];
 
 // Use a prepared statement to prevent SQL injection
-$stmt = $dbCon->prepare("DELETE FROM clerk WHERE CLERKID = ?");
+$stmt = $dbCon->prepare("UPDATE clerk SET STATUS = 'inactive' WHERE CLERKID = ?");
 $stmt->bind_param("i", $clerkId);
 
 if ($stmt->execute()) {

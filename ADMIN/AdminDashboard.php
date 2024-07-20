@@ -22,7 +22,7 @@ $stmt->close();
 $firstName = strtoupper(strtok($fullName, ' '));
 
 // Fetch the total number of clerks
-$sql = "SELECT COUNT(*) FROM clerk";
+$sql = "SELECT COUNT(*) FROM clerk WHERE STATUS = 'active'";
 $result = $dbCon->query($sql);
 $totalClerks = $result->fetch_row()[0];
 

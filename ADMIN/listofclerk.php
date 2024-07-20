@@ -18,7 +18,7 @@ $offset = ($page - 1) * $itemsPerPage;
 $search = isset($_GET['search']) ? $dbCon->real_escape_string($_GET['search']) : '';
 
 // Count total clerks
-$sql = "SELECT COUNT(*) AS total FROM clerk WHERE CLERKTYPE='clerk'";
+$sql = "SELECT COUNT(*) AS total FROM clerk WHERE CLERKTYPE='clerk' AND STATUS='active'";
 if ($search) {
     $sql .= " AND (CLERKNAME LIKE '%$search%' OR CLERKEMAIL LIKE '%$search%')";
 }
@@ -28,7 +28,7 @@ $totalClerks = $row['total'];
 $totalPages = ceil($totalClerks / $itemsPerPage);
 
 // Fetch clerks for the current page
-$sql = "SELECT * FROM clerk WHERE CLERKTYPE='clerk'";
+$sql = "SELECT * FROM clerk WHERE CLERKTYPE='clerk' AND STATUS='active'";
 if ($search) {
     $sql .= " AND (CLERKNAME LIKE '%$search%' OR CLERKEMAIL LIKE '%$search%')";
 }
