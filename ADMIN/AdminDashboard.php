@@ -27,7 +27,7 @@ $result = $dbCon->query($sql);
 $totalClerks = $result->fetch_row()[0];
 
 // Fetch the total number of students
-$sql = "SELECT COUNT(*) FROM student";
+$sql = "SELECT COUNT(*) FROM student WHERE STATUS='active'";
 $result = $dbCon->query($sql);
 $totalStudents = $result->fetch_row()[0];
 
