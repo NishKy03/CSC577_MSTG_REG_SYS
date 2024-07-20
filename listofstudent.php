@@ -21,6 +21,13 @@ $stmt->close();
 
 $firstName = strtoupper(strtok($fullName, ' '));
 
+$sqlPrincipal = "SELECT MAX(PRINCIPALID) FROM principal";
+$stmtPrincipal = $dbCon->prepare($sqlPrincipal);
+$stmtPrincipal->execute();
+$stmtPrincipal->bind_result($principalId);
+$stmtPrincipal->fetch();
+$stmtPrincipal->close();
+
 // Pagination setup
 $limit = 10; // Number of entries per page
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -36,7 +43,7 @@ $stmt->close();
 
 $total_pages = ceil($total / $limit);
 
-$sql = "SELECT s.STUID, s.STUNAME, s.STUEMAIL, r.STATUS, r.CLERKID FROM student as s JOIN registration as r ON s.STUID = r.STUID LIMIT ?, ?";
+$sql = "SELECT s.STUID, s.STUNAME, s.STUEMAIL, r.STATUS, r.CLERKID FROM student as s JOIN registration as r ON s.STUID = r.STUID WHERE r.REGSTATUS = 'active' ORDER BY r.STATUS DESC LIMIT ?, ? ";
 $stmt = $dbCon->prepare($sql);
 $stmt->bind_param("ii", $start, $limit);
 $stmt->execute();
@@ -46,20 +53,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $studentId = $_POST['id'];
     $newStatus = $_POST['status'];
 
-    $sql = "UPDATE registration SET STATUS = ? WHERE STUID = ?";
+    $sql = "UPDATE registration SET STATUS = ?, CLERKID = ?, PRINCIPALID = ? WHERE STUID = ?";
     $stmtUpdate = $dbCon->prepare($sql);
-    $stmtUpdate->bind_param("ss", $newStatus, $studentId);
+    $stmtUpdate->bind_param("ssss", $newStatus, $username, $principalId, $studentId);
 
     if ($stmtUpdate->execute()) {
         echo 'success';
     } else {
-        echo 'error';
+        echo 'error: ' . $stmtUpdate->error; // Log the error
     }
 
     $stmtUpdate->close();
     exit; // Ensure no further code is executed after updating the status
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -332,6 +340,35 @@ select:focus {
 .pagination a:hover {
     background-color: #ddd;
 }
+.add-student {
+            background-color: #f0ad4e;
+            margin-left: 300px;
+            margin-top: 15px;
+            border-radius: 15px;
+            height: 52px;
+            display: :flex;
+            align-items: end;
+            justify-content: end;
+            padding: 10px 15px;
+            transition: background-color 0.3s; /* Added transition for background color change */
+            color: white;
+            text-decoration: none; /* Ensure it behaves like a button or link */
+        }
+
+        .add-student:hover {
+            background-color: ##cf9a4e; /* Darker shade on hover */
+            color: white; /* Ensure text remains white on hover */
+        }
+
+        .add-student a{
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            padding: 10px 15px;
+        }
+        .add-student i{
+            margin-right: 5px;
+        }
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -383,6 +420,9 @@ select:focus {
                 <p><i class="fa fa-th-large" style="font-size:25px;"></i>List of Student</p>
                 <a href="printStudentList.php" id="printbtn" style="text-decoration: none; color: #000; text-align: end;">Print<i class="fa fa-print" style="font-size:25px;"></i></a>
             </div>
+            <div class="add-student">
+                <a href="signup.php"><i class="fa fa-user-plus" aria-hidden="true"></i>Add Student</a>
+            </div>
             <table>
                 <tr>
                     <th>#</th>
@@ -402,13 +442,14 @@ select:focus {
                         echo "<td>" . htmlspecialchars($row['STUNAME']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['STUEMAIL']) . "</td>";
                         echo "<td style='text-align: center'>";
-                            if ($row['STATUS'] == 'Pending') {
-                                echo "<select class='status-dropdown' data-id='" . htmlspecialchars($row['STUID']) . "'>";
-                                echo "<option value='Pending' selected>Pending</option>";
-                                echo "<option value='Approved'>Approved</option>";
-                                echo "</select>";
-                                echo "<button id='updateSttsbtn' onclick='updateStatus(\"" . htmlspecialchars($row['STUID']) . "\")'>Update</button>";
-                            } else {
+                        if ($row['STATUS'] == 'Pending' || $row['STATUS'] == 'Rejected') {
+                            echo "<select class='status-dropdown' data-id='" . htmlspecialchars($row['STUID']) . "'>";
+                            echo "<option value='Pending'" . ($row['STATUS'] == 'Pending' ? ' selected' : '') . ">Pending</option>";
+                            echo "<option value='Approved'>Approve</option>";
+                            echo "<option value='Rejected'" . ($row['STATUS'] == 'Rejected' ? ' selected' : '') . ">Reject</option>";
+                            echo "</select>";
+                            echo "<button id='updateSttsbtn' onclick='updateStatus(\"" . htmlspecialchars($row['STUID']) . "\")'>Update</button>";
+                        } else {
                                 echo htmlspecialchars($row['STATUS']);
                             }
                         echo "</td>";
@@ -459,32 +500,33 @@ select:focus {
     }
 
     function updateStatus(studentId) {
-    const selectElement = document.querySelector(`.status-dropdown[data-id='${studentId}']`);
-    const newStatus = selectElement.value;
+        const selectElement = document.querySelector(`.status-dropdown[data-id='${studentId}']`);
+        const newStatus = selectElement.value;
 
-    fetch('listofstudent.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `id=${studentId}&status=${newStatus}`
-    })
-    .then(response => response.text())
-    .then(data => {
-        if (data.trim() === 'success') {
-            // Reload the page immediately to see the updated status
-            location.reload();
-        } else {
-            // Show an alert if the update failed
-            console.error('Failed to update status.');
-            alert('Failed to update status.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while updating the status.');
-    });
-}
+        fetch('listofstudent.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `id=${studentId}&status=${newStatus}`
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.trim() === 'success') {
+                // Reload the page immediately to see the updated status
+                location.reload();
+            } else {
+                // Show an alert if the update failed
+                console.error('Failed to update status.');
+                alert('Failed to update status.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the status.');
+        });
+    }
+
 
     // Sort the Rows
     document.addEventListener('DOMContentLoaded', function () {

@@ -331,7 +331,7 @@ table tr td{
                 $stmt1->bind_param("i", $username);
                 $stmt1->execute();
                 $stmt1->store_result();
-                $stmt1->bind_result($clerkID, $clerkName, $clerkPhone, $clerkDOB, $clerkEmail, $clerkType, $clerkPassword, $clerkImage);
+                $stmt1->bind_result($clerkID, $clerkName, $clerkPhone, $clerkDOB, $clerkEmail, $clerkType, $clerkPassword, $clerkImage,$clerkStatus);
                 $row = $stmt1->fetch();
 
             ?>
@@ -372,6 +372,12 @@ table tr td{
                                 <p>
                                     <b>Date of Birth :</b><br>
                                     <span><?php echo $clerkDOB; ?></span>
+                                </p>
+                            </div>
+                            <div class="clerkinput">
+                                <p>
+                                    <b>Clerk Status :</b><br>
+                                    <span><?php echo $clerkStatus; ?></span>
                                 </p>
                             </div>
                             <div class="edit-button">

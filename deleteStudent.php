@@ -13,12 +13,12 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
     // Function to delete student record
     function deleteStudent($dbCon, $studentId) {
-        $sql = "DELETE FROM registration WHERE STUID = ?";
+        $sql = "UPDATE registration SET REGSTATUS = 'inactive' WHERE STUID = ?";
         $stmt = $dbCon->prepare($sql);
         $stmt->bind_param("s", $studentId);
         
         if ($stmt->execute()) {
-            $sql2 = "DELETE FROM student WHERE STUID = ?";
+            $sql2 = "UPDATE student SET STATUS = 'inactive' WHERE STUID = ?";
             $stmt2 = $dbCon->prepare($sql2);
             $stmt2->bind_param("s", $studentId);
 
