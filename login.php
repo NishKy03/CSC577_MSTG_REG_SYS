@@ -120,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .wrapper {
             width: 600px;
-            height: 700px;
+            height: 600px;
             margin-top: 6%;
             background-color: white;
             border-radius: 30px;
