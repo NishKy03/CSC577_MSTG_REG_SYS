@@ -24,14 +24,14 @@ $firstName = strtoupper(strtok($fullName, ' '));
 $totalStudents = 0;
 $totalClerks = 0;
 
-$sql = "SELECT COUNT(*) AS count FROM student";
+$sql = "SELECT COUNT(*) AS count FROM student WHERE STATUS='active'";
 $result = $dbCon->query($sql);
 if ($result) {
     $row = $result->fetch_assoc();
     $totalStudents = $row['count'];
 }
 
-$sql = "SELECT COUNT(*) AS count FROM clerk";
+$sql = "SELECT COUNT(*) AS count FROM clerk WHERE STATUS='active'";
 $result = $dbCon->query($sql);
 if ($result) {
     $row = $result->fetch_assoc();
