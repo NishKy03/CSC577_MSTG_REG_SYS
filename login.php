@@ -271,16 +271,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <input type="submit" name="submit" value="LOGIN">
             </form>
-            
-            <a href="forgot-password.html">Forgot Password?</a>
-
-            <div class="line1"></div> 
-            <p align="center">or</p> 
-            <div class="line2"></div>
-
-            <div class="dont-have-account">
-                <p>Don't have an account? <a href="signup.php"><b>Sign Up</b></a></p>
-            </div>
         </div>
     </body>
 </html>
