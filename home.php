@@ -381,12 +381,6 @@ $dbCon->close();
                         <span id="totalStudents" class="count-up"><?php echo $totalStudents; ?></span><br>Students
                     </p>
                 </div>
-                <div class="management-parent">
-                    <span style="font-size: 50px;"><i class="fa fa-users" aria-hidden="true"></i></span>
-                    <p>
-                        <span id="totalClerks" class="count-up"><?php echo $totalClerks; ?></span><br>Clerks
-                    </p>
-                </div>
             </div>
             
             <script>
