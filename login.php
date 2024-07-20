@@ -264,10 +264,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <label for="username"><i class="fa fa-user" aria-hidden="true"></i>Username</label><br>
-                <input type="text" name="username" id="username" required><br>
+                <input type="text" name="username" id="username" required placeholder="Enter ID"><br>
 
                 <label for="password"><i class="fa fa-lock" aria-hidden="true"></i>Password</label><br>
-                <input type="password" name="password" id="password" required><br>
+                <input type="password" name="password" id="password" required placeholder="Enter Password"><br>
 
                 <input type="submit" name="submit" value="LOGIN">
             </form>
