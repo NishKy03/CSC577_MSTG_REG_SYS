@@ -39,8 +39,8 @@ p{
 .wrapper{
     margin-top: 40px;
     border: 2px solid;
-    height: 467px;
-    width: 662px;
+    height: 350px;
+    width: 502px;
     background-color: white;
     border: none;
     border-radius: 30px;
@@ -52,28 +52,30 @@ p{
     margin-top: 70px;
 }
 .wrapper a{
-    width: 379px;
     border: 2px solid;
-    height: 66px;
     align-items: center;
     justify-content: center;
     display: flex;
-    margin-left: 135px;
     color: black;
     font-family: 'Inter';
     font-size: 25px;
     text-decoration: none;
     border-radius: 5px;
     font-weight: 100;
+    width: 80%;
+    padding: 20px;
 }
 .wrapper .button1{
     margin-top: 25px;
     background-color: #D09B35;
     border: none;
+    margin-left: 50px;
+    transition: background-color 0.3s, color 0.3s;
+
 }
-.wrapper .button2{
-    margin-top: 20px;
-    border: 1px solid;
+.wrapper .button1:hover{
+    background-color: #b0832b;
+    color: white;
 }
 .img-class img{
     width: 150px;
@@ -92,7 +94,6 @@ p{
     <div class="wrapper">
         <p>Hello!</p><br>
         <a href="login.php" class="button1">LOGIN</a>
-        <a href="signup.php" class="button2">SIGN UP</a>
     </div>
 </body>
 </html>

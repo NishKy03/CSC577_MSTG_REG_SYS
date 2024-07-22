@@ -252,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 table{
     width: 80%;
     border-collapse: collapse;
-    margin-top: 60px;
+    margin-top: 40px;
 }
 table th, table td{
     padding: 12px;
@@ -342,14 +342,13 @@ select:focus {
 }
 .add-student {
             background-color: #f0ad4e;
-            margin-left: 300px;
-            margin-top: 15px;
+            margin-left: 1100px;
+            margin-top: 40px;
             border-radius: 15px;
-            height: 52px;
             display: :flex;
-            align-items: end;
-            justify-content: end;
-            padding: 10px 15px;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 15px;
             transition: background-color 0.3s; /* Added transition for background color change */
             color: white;
             text-decoration: none; /* Ensure it behaves like a button or link */
@@ -421,7 +420,7 @@ select:focus {
                 <a href="printStudentList.php" id="printbtn" style="text-decoration: none; color: #000; text-align: end;">Print<i class="fa fa-print" style="font-size:25px;"></i></a>
             </div>
             <div class="add-student">
-                <a href="signup.php"><i class="fa fa-user-plus" aria-hidden="true"></i>Add Student</a>
+                <a href="addstu.php"><i class="fa fa-user-plus" aria-hidden="true"></i>Add Student</a>
             </div>
             <table>
                 <tr>

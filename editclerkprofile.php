@@ -34,11 +34,11 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
             $CLERKNAME_err = "Only letters and white space allowed.";
         }
     }
-    if(empty(trim($_POST['CLERKPHONENO']))){
+    if(empty(trim($_POST['CLERKPNO']))){
         $CLERKPHONENO_err = "Please enter your phone number.";
     } else{
-        $CLERKPHONENO = trim($_POST['CLERKPHONENO']);
-        if(!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $CLERKPHONENO)){
+        $CLERKPNO = trim($_POST['CLERKPNO']);
+        if(!preg_match("/^\d{3}-\d{7}|\d{3}-\d{6}$/", $CLERKPNO)){
             $CLERKPHONENO_err = "Phone Number must be in format 'XXX-XXXXXXXX' or 'XXX-XXXXXXX'";
         }
     }
@@ -56,7 +56,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
 
     $sql1 = "UPDATE clerk SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ? WHERE CLERKID = ?";
     $stmt1 = $dbCon->prepare($sql1);
-    $stmt1->bind_param("sssss", $CLERKNAME, $CLERKPHONENO, $CLERKEMAIL, $CLERKDOB, $username);
+    $stmt1->bind_param("sssss", $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $username);
     if($stmt1->execute()){
         echo "<script>alert('Profile updated successfully.');
         window.location.href = 'ClerkProfile.php'</script>";
@@ -126,14 +126,14 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
         if ($updateStmt === false) {
             die("Prepare failed: " . $dbCon->error);
         }
-        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPHONENO, $CLERKEMAIL, $CLERKDOB, basename($_FILES["CLERKIMAGE"]["name"]), $username);
+        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, basename($_FILES["CLERKIMAGE"]["name"]), $username);
     } else {
         // Update user data without changing profile image
         $updateStmt = $dbCon->prepare("UPDATE CLERK SET CLERKNAME = ?, CLERKPNO = ?, CLERKEMAIL = ?, CLERKDOB = ? WHERE CLERKID = ?");
         if ($updateStmt === false) {
             die("Prepare failed: " . $dbCon->error);
         }
-        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPHONE, $CLERKEMAIL, $CLERKDOB, $username);
+        $updateStmt->bind_param('sssss', $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $username);
     }
 
     if (!$updateStmt->execute()) {
@@ -467,7 +467,7 @@ table tr td{
                         </tr>
                         <tr>
                             <td><b>Phone Number : </b></td>
-                            <td><input type="text" name="CLERKPHONENO" id="CLERKPHONENO" value="<?php echo $phoneNo; ?>"><span id="ClerkPNOError" class="error"><?php echo $CLERKPHONENO_err?></span></td>
+                            <td><input type="text" name="CLERKPNO" id="CLERKPNO" value="<?php echo $phoneNo; ?>"><span id="ClerkPNOError" class="error"><?php echo $CLERKPHONENO_err?></span></td>
                             
                         </tr>
                         <tr>
@@ -508,7 +508,7 @@ table tr td{
             }
 
             // Validate Student's Phone Number
-            var ClerkPhone = document.getElementById('CLERKPHONENO').value.trim();
+            var ClerkPhone = document.getElementById('CLERKPNO').value.trim();
             if (!ClerkPhone.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
                 document.getElementById('ClerkPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
                 isValid = false;
@@ -538,7 +538,7 @@ table tr td{
             }
         });
 
-        document.getElementById('CLERKPHONENO').addEventListener('input', function() {
+        document.getElementById('CLERKPNO').addEventListener('input', function() {
             var ClerkPNO = this.value.trim();
             if (!ClerkPNO.match(/^\d{3}-\d{7}|\d{3}-\d{6}$/)) {
                 document.getElementById('ClerkPNOError').innerHTML = 'Please enter a valid phone number (format: XXX-XXXXXXX or XXX-XXXXXXXX).';
