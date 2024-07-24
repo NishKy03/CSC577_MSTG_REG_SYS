@@ -87,6 +87,7 @@ $dbCon->close();
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arial:wght@700&display=swap" />
 </head>
@@ -523,7 +524,13 @@ body.dark .home .text{
                     <li class="nav-link">
                         <a href="../PRINCIPAL/report.php">
                             <i class='bx bx-bar-chart-alt-2 icon' ></i>
-                            <span class="text nav-text">Report</span>
+                            <span class="text nav-text">Student Report</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="../PRINCIPAL/clerkReport.php">
+                            <i class='bx bx-bar-chart-alt-2 icon' ></i>
+                            <span class="text nav-text">Clerk Report</span>
                         </a>
                     </li>
                     <li class="">
@@ -619,9 +626,25 @@ body.dark .home .text{
                         title: {
                             display: true,
                             text: 'Student Gender Distribution'
+                        },
+                        datalabels: {
+                            formatter: (value, context) => {
+                                let sum = 0;
+                                const dataArr = context.chart.data.datasets[0].data;
+                                dataArr.map(data => {
+                                    sum += data;
+                                });
+                                const percentage = (value * 100 / sum).toFixed(2) + "%";
+                                return `${value} (${percentage})`;
+                            },
+                            color: '#000',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     }
                 },
+                plugins: [ChartDataLabels]
             });
 
             const registrationLabels = registrationData.map(item => item.year);
@@ -649,6 +672,15 @@ body.dark .home .text{
                         title: {
                             display: true,
                             text: 'Student Registrations Over the Years'
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            formatter: (value) => value,
+                            color: '#000',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     },
                     scales: {
@@ -657,6 +689,7 @@ body.dark .home .text{
                         }
                     }
                 },
+                plugins: [ChartDataLabels]
             });
         });
     </script>
