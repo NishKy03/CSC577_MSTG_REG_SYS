@@ -58,3 +58,12 @@ CREATE TABLE REGISTRATION (
 );
 
 ALTER TABLE REGISTRATION AUTO_INCREMENT = 40001;
+
+CREATE TABLE notifications (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    stuid VARCHAR(20),
+    message TEXT,
+    status ENUM('unread', 'read') DEFAULT 'unread',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (stuid) REFERENCES STUDENT(stuid),
+);

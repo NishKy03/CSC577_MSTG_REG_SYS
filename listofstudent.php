@@ -58,6 +58,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmtUpdate->bind_param("ssss", $newStatus, $username, $principalId, $studentId);
 
     if ($stmtUpdate->execute()) {
+        // Function to add notification
+        function addNotification($dbCon, $studentId, $message) {
+            $sql = "INSERT INTO notifications (STUID, MESSAGE) VALUES (?, ?)";
+            $stmt = $dbCon->prepare($sql);
+            $stmt->bind_param("ss", $studentId, $message);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        // Check the registration status and add notification
+        if ($newStatus === 'Approved') {
+            addNotification($dbCon, $studentId, 'Your registration has been approved.');
+        } elseif ($newStatus === 'Rejected') {
+            addNotification($dbCon, $studentId, 'Your registration has been rejected.');
+        }
+
         echo 'success';
     } else {
         echo 'error: ' . $stmtUpdate->error; // Log the error

@@ -40,6 +40,27 @@ if ($result) {
     $totalClerks = $row['count'];
 }
 
+$sql5 = "SELECT message FROM notifications WHERE stuid = ? AND status = 'unread'";
+$stmt5 = $dbCon->prepare($sql5);
+$stmt5->bind_param("s", $username);
+$stmt5->execute();
+$result = $stmt5->get_result();
+$notifications = [];
+while ($row = $result->fetch_assoc()) {
+    $notifications[] = $row['message'];
+}
+$stmt5->close();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_read'])) {
+    $sql = "UPDATE notifications SET status = 'read' WHERE stuid = ?";
+    $stmt = $dbCon->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->close();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 $dbCon->close();
 ?>
 
@@ -305,7 +326,50 @@ $dbCon->close();
     text-align: center;
     font-size: 30px;
 }
+.notification-icon {
+    position: relative;
+    display: inline-block;
+}
 
+.notification-icon .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 10px;
+}
+
+.notifications-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.notifications-dropdown ul {
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+}
+
+.notifications-dropdown ul li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-icon:hover .notifications-dropdown {
+    display: block;
+}
+.message {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -318,6 +382,24 @@ $dbCon->close();
             <a href="studentprofile.php">
                 <i class="fa fa-user" aria-hidden="true"></i>
             </a>
+            <div class="notification-icon">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+                <?php if (count($notifications) > 0): ?>
+                    <span class="badge"><?php echo count($notifications); ?></span>
+                    <div class="notifications-dropdown">
+                        <ul>
+                            <?php foreach ($notifications as $notification): ?>
+                                <li class="message"><?php echo htmlspecialchars($notification); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <form method="post">
+                            <input type="hidden" name="mark_read" value="1">
+                            <button type="submit"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                        </form>
+                    </div>
+                <?php endif; ?>
+               
+            </div>
         </div>
     </div>
     <div class="body">
