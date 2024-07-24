@@ -370,6 +370,16 @@ $dbCon->close();
     margin: 0;
     padding: 0;
 }
+.read-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #cf9a4e;
+    border: none;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+}
 </style>
 <body>
     <input type="checkbox" id="checkbox">
@@ -394,7 +404,7 @@ $dbCon->close();
                         </ul>
                         <form method="post">
                             <input type="hidden" name="mark_read" value="1">
-                            <button type="submit"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button class="read-button" type="submit"><i class="fa fa-eye" aria-hidden="true">Mark as Read</i></button>
                         </form>
                     </div>
                 <?php endif; ?>
