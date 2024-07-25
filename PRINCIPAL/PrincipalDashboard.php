@@ -52,7 +52,7 @@ $stmtGenderDistribution->execute();
 $resultGenderDistribution = $stmtGenderDistribution->get_result();
 $genderData = [];
 while ($row = $resultGenderDistribution->fetch_assoc()) {
-    $genderData[] = $row;
+    $genderData[] = $row;s
 }
 $stmtGenderDistribution->close();
 

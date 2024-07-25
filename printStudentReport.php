@@ -178,12 +178,7 @@
             </tr>
             <tr class="details">
                 <td class="topbotright-b" >Date Of Birth:</td>
-                <td class="topbotleft-b"><?php // Creating timestamp from given date
-                                            $timestamp = strtotime($stuDOB);
-                                            
-                                            // Creating new date format from that timestamp
-                                            $new_date = date("d-m-Y", $timestamp);
-                                            echo $new_date;  ?></td>
+                <td class="topbotleft-b"><?php echo !empty($stuDOB) ? date("d-m-Y", strtotime($stuDOB)) : ''; ?></td>
             </tr>
             <tr class="details">
                 <td class="topright-b" >Gender:</td>

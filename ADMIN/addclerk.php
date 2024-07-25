@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $CLERKPASSWORD = '123'; 
     $CLERKTYPE = 'clerk'; 
+    $CLERKSTATUS = 'active';
     $newProfileImage = $_FILES['CLERKIMAGE']['name'];
 
     // Get the max CLERKID from the database
@@ -95,11 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Insert the new clerk data
     if(empty($CLERKNAME_err) && empty($CLERKEMAIL_err) && empty($CLERKPNO_err) && empty($CLERKDOB_err)) {
-        $stmt = $dbCon->prepare("INSERT INTO clerk (CLERKID, CLERKNAME, CLERKPNO, CLERKEMAIL, CLERKDOB, CLERKPASSWORD, CLERKIMAGE, CLERKTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $dbCon->prepare("INSERT INTO clerk (CLERKID, CLERKNAME, CLERKPNO, CLERKEMAIL, CLERKDOB, CLERKPASSWORD, CLERKIMAGE, CLERKTYPE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt === false) {
             die("<script>alert('Error preparing SQL: " . $dbCon->error . "');</script>");
         }
-        $stmt->bind_param('isssssss', $newClerkId, $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $CLERKPASSWORD, $newProfileImage, $CLERKTYPE);
+        $stmt->bind_param('issssssss', $newClerkId, $CLERKNAME, $CLERKPNO, $CLERKEMAIL, $CLERKDOB, $CLERKPASSWORD, $newProfileImage, $CLERKTYPE, $CLERKSTATUS);
         
         if ($stmt->execute()) {
             echo "<script>alert('New clerk record created successfully.'); window.location.href='listofclerk.php';</script>";

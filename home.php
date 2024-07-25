@@ -348,6 +348,9 @@ $dbCon->close();
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     z-index: 1000;
+    font-size: 18px;
+    width: 400px;
+    margin-top: 10px;
 }
 
 .notifications-dropdown ul {
@@ -377,8 +380,11 @@ $dbCon->close();
     background: #cf9a4e;
     border: none;
     color: #333;
-    font-size: 14px;
     cursor: pointer;
+}
+.read-button i{
+    font-size: 18px;
+    padding-right: 20px;
 }
 </style>
 <body>
@@ -404,7 +410,7 @@ $dbCon->close();
                         </ul>
                         <form method="post">
                             <input type="hidden" name="mark_read" value="1">
-                            <button class="read-button" type="submit"><i class="fa fa-eye" aria-hidden="true">Mark as Read</i></button>
+                            <button class="read-button" type="submit"><i class="fa fa-eye" aria-hidden="true"> Mark as Read</i></button>
                         </form>
                     </div>
                 <?php endif; ?>

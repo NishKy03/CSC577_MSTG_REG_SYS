@@ -388,18 +388,32 @@ th {
 tbody tr:nth-child(odd) {
     background-color: #f2f2f2;
 }
+.print-button {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Add transition for smooth effect */
+}
+
+.print-button:hover {
+    background-color: grey; /* Change background color on hover */
+    color: #333; /* Change text color on hover */
+}
+
 </style>
 <body>
-    <nav class="sidebar close">
+<nav class="sidebar close">
         <header>
-        <span class="image">
-            <img src="../ClerkImage/chibi.jpg" alt="">
-        </span>
-        <div class="text logo-text">
-            <span class="name">Welcome!</span>
-            <span class="profession"> Principal </span>
-        </div>
-        <i class='bx bx-chevron-right toggle'></i>
+            <span class="image">
+                <img src="../ClerkImage/chibi.jpg" alt="">
+            </span>
+            <div class="text logo-text">
+                <span class="name">Welcome!</span>
+                <span class="profession">Principal</span>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
         </header>
 
         <div class="menu-bar">
@@ -415,7 +429,7 @@ tbody tr:nth-child(odd) {
                     <li class="nav-link">
                         <a href="../PRINCIPAL/report.php">
                             <i class='bx bx-bar-chart-alt-2 icon' ></i>
-                            <span class="text nav-text">Report</span>
+                            <span class="text nav-text">Student Report</span>
                         </a>
                     </li>
                     <li class="nav-link">
@@ -425,7 +439,7 @@ tbody tr:nth-child(odd) {
                         </a>
                     </li>
                     <li class="">
-                        <a href="logout.php">
+                        <a href="../logout.php">
                             <i class='bx bx-log-out icon' ></i>
                             <span class="text nav-text">Logout</span>
                         </a>
@@ -433,16 +447,14 @@ tbody tr:nth-child(odd) {
                 </ul>
             </div>
         </div>
-
     </nav>
 
     <section class="home">
         <div class="dashboard-wrapper">Report</div>
         <div class="table-wrapper">
-           
-
             <h2>Clerk List</h2>
-            <table>
+            <button class="print-button" onclick="printTable()">Print</button>
+            <table id="clerkTable">
                 <thead>
                     <tr>
                         <th>No.</th>
@@ -474,32 +486,16 @@ tbody tr:nth-child(odd) {
     </section>
 
     <script>
-        const body = document.querySelector('body'),
-      sidebar = body.querySelector('nav'),
-      toggle = body.querySelector(".toggle"),
-      searchBtn = body.querySelector(".search-box"),
-      modeSwitch = body.querySelector(".toggle-switch"),
-      modeText = body.querySelector(".mode-text");
+        function printTable() {
+            const printContents = document.getElementById('clerkTable').outerHTML;
+            const originalContents = document.body.innerHTML;
 
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            location.reload();  // Reload the page to reset the table
+        }
 
-toggle.addEventListener("click" , () =>{
-    sidebar.classList.toggle("close");
-})
-
-searchBtn.addEventListener("click" , () =>{
-    sidebar.classList.remove("close");
-})
-
-modeSwitch.addEventListener("click" , () =>{
-    body.classList.toggle("dark");
-    
-    if(body.classList.contains("dark")){
-        modeText.innerText = "Light mode";
-    }else{
-        modeText.innerText = "Dark mode";
-        
-    }
-});
     </script>
 
 </body>

@@ -391,6 +391,19 @@ th {
 tbody tr:nth-child(odd) {
     background-color: #f2f2f2;
 }
+.print-button {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Add transition for smooth effect */
+}
+
+.print-button:hover {
+    background-color: grey; /* Change background color on hover */
+    color: #333; /* Change text color on hover */
+}
 </style>
 <body>
     <nav class="sidebar close">
@@ -407,7 +420,7 @@ tbody tr:nth-child(odd) {
 
         <div class="menu-bar">
             <div class="menu">
-                <ul class="menu-links">
+            <ul class="menu-links">
                     <li class="nav-link">
                         <a href="../PRINCIPAL/PrincipalDashboard.php">
                             <i class='bx bx-home-alt icon' ></i>
@@ -418,7 +431,7 @@ tbody tr:nth-child(odd) {
                     <li class="nav-link">
                         <a href="../PRINCIPAL/report.php">
                             <i class='bx bx-bar-chart-alt-2 icon' ></i>
-                            <span class="text nav-text">Report</span>
+                            <span class="text nav-text">Student Report</span>
                         </a>
                     </li>
                     <li class="nav-link">
@@ -428,7 +441,7 @@ tbody tr:nth-child(odd) {
                         </a>
                     </li>
                     <li class="">
-                        <a href="logout.php">
+                        <a href="../logout.php">
                             <i class='bx bx-log-out icon' ></i>
                             <span class="text nav-text">Logout</span>
                         </a>
@@ -443,7 +456,8 @@ tbody tr:nth-child(odd) {
         <div class="dashboard-wrapper">Report</div>
         <div class="table-wrapper">
             <h2>Student List</h2>
-            <table>
+            <button class="print-button" onclick="printTable()">Print</button>
+            <table id="studentTable">
                 <thead>
                     <tr>
                         <th>Matric No.</th>
@@ -462,9 +476,9 @@ tbody tr:nth-child(odd) {
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($studentId) . "</td>";
                             echo "<td>" . htmlspecialchars($studentName) . "</td>";
-                            echo "<td>" . (isset($studentDob) ? calculateAge($studentDob) : 'Unknown') . "</td>";
-                            echo "<td>" . htmlspecialchars($studentGender) . "</td>";
-                            echo "<td>" . htmlspecialchars($studentAddress) . "</td>";
+                            echo "<td>" . (isset($studentDob) && !empty($studentDob) ? calculateAge($studentDob) : '') . "</td>";
+                            echo "<td>" . (isset($studentGender) && !empty($studentGender) ? htmlspecialchars($studentGender) : '') . "</td>";
+                            echo "<td>" . (isset($studentAddress) && !empty($studentAddress) ? htmlspecialchars($studentAddress) : '') . "</td>";
                             echo "</tr>";
                         }
                     } else {
@@ -474,37 +488,19 @@ tbody tr:nth-child(odd) {
                     ?>
                 </tbody>
             </table>
-
         </div>
     </section>
 
     <script>
-        const body = document.querySelector('body'),
-      sidebar = body.querySelector('nav'),
-      toggle = body.querySelector(".toggle"),
-      searchBtn = body.querySelector(".search-box"),
-      modeSwitch = body.querySelector(".toggle-switch"),
-      modeText = body.querySelector(".mode-text");
+        function printTable() {
+            const printContents = document.getElementById('studentTable').outerHTML;
+            const originalContents = document.body.innerHTML;
 
-
-toggle.addEventListener("click" , () =>{
-    sidebar.classList.toggle("close");
-})
-
-searchBtn.addEventListener("click" , () =>{
-    sidebar.classList.remove("close");
-})
-
-modeSwitch.addEventListener("click" , () =>{
-    body.classList.toggle("dark");
-    
-    if(body.classList.contains("dark")){
-        modeText.innerText = "Light mode";
-    }else{
-        modeText.innerText = "Dark mode";
-        
-    }
-});
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            location.reload();  // Reload the page to reset the table
+        }
     </script>
 
 </body>
